@@ -1,0 +1,258 @@
+@import "tailwindcss";
+
+/* ============================================
+   柏里挑怡 · 三色主题
+   柏欣妤 = 白（纯净星光）
+   朱怡欣 = 蓝（心动深海）
+   CP 紫 = 白+蓝交融（柏里挑怡紫）
+   ============================================ */
+
+:root {
+  /* 基础背景：深空紫调 */
+  --background: oklch(0.13 0.025 285);
+  --foreground: oklch(0.97 0.005 285);
+
+  /* Bento 卡片表面 */
+  --surface: oklch(0.18 0.03 285);
+  --surface-2: oklch(0.22 0.035 285);
+  --surface-3: oklch(0.27 0.04 285);
+
+  /* 三色体系 */
+  --bai: oklch(0.95 0.005 260);       /* 柏欣妤 · 星光白 */
+  --bai-glow: oklch(0.92 0.01 260);   /* 白光晕 */
+  --zhu: oklch(0.60 0.18 250);        /* 朱怡欣 · 心动蓝 */
+  --zhu-glow: oklch(0.55 0.20 250);   /* 蓝光晕 */
+  --cp: oklch(0.65 0.22 295);         /* 柏里挑怡 · 交融紫 */
+  --cp-glow: oklch(0.60 0.25 295);    /* 紫光晕 */
+  --cp-soft: oklch(0.50 0.15 290);    /* 柔和紫 */
+
+  /* 文字层级 */
+  --muted: oklch(0.68 0.02 285);
+  --border: oklch(0.28 0.04 285);
+  --border-glow: oklch(0.50 0.12 290);
+
+  /* 字体变量 */
+  --font-serif: "Fraunces", Georgia, "Noto Serif SC", serif;
+  --font-sans: "Manrope", "Noto Sans SC", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-bai: var(--bai);
+  --color-zhu: var(--zhu);
+  --color-cp: var(--cp);
+  --color-accent: var(--cp);
+  --color-accent-2: var(--zhu);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   三色交融 mesh atmosphere
+   白 + 蓝 + 紫 = 柏里挑怡的天空
+   ============================================ */
+.cp-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 15%, oklch(0.60 0.18 250 / 0.18), transparent 65%),
+    radial-gradient(ellipse 80% 60% at 85% 25%, oklch(0.95 0.01 260 / 0.08), transparent 60%),
+    radial-gradient(ellipse 70% 80% at 50% 90%, oklch(0.65 0.22 295 / 0.15), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 30% 60%, oklch(0.55 0.20 250 / 0.10), transparent 60%);
+  animation: cp-mesh-drift 25s ease-in-out infinite alternate;
+}
+
+@keyframes cp-mesh-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  100% { transform: translate3d(2%, -3%, 0) scale(1.06); }
+}
+
+/* 星点粒子（点缀氛围） */
+.cp-stars {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, oklch(0.95 0.01 260 / 0.4), transparent),
+    radial-gradient(1px 1px at 30% 50%, oklch(0.60 0.18 250 / 0.3), transparent),
+    radial-gradient(1.5px 1.5px at 55% 15%, oklch(0.95 0.01 260 / 0.5), transparent),
+    radial-gradient(1px 1px at 70% 70%, oklch(0.65 0.22 295 / 0.3), transparent),
+    radial-gradient(1px 1px at 85% 40%, oklch(0.60 0.18 250 / 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 45% 80%, oklch(0.95 0.01 260 / 0.3), transparent),
+    radial-gradient(1px 1px at 90% 85%, oklch(0.65 0.22 295 / 0.2), transparent),
+    radial-gradient(1px 1px at 20% 85%, oklch(0.60 0.18 250 / 0.3), transparent);
+}
+
+/* ============================================
+   Bento 卡片
+   ============================================ */
+.bento-tile {
+  background: color-mix(in oklch, var(--surface), transparent 5%);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 0.4s ease,
+              box-shadow 0.4s ease,
+              background 0.4s ease;
+  position: relative;
+  backdrop-filter: blur(8px);
+}
+
+.bento-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    oklch(0.95 0.01 260 / 0.03) 0%,
+    transparent 50%,
+    oklch(0.60 0.18 250 / 0.03) 100%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.bento-tile:hover {
+  transform: translateY(-3px) scale(1.01);
+  border-color: var(--cp);
+  box-shadow:
+    0 0 0 1px oklch(0.65 0.22 295 / 0.25),
+    0 25px 70px -25px oklch(0.65 0.22 295 / 0.35),
+    0 0 40px -10px oklch(0.60 0.18 250 / 0.15);
+}
+
+.bento-tile:hover::before {
+  opacity: 1;
+}
+
+/* ============================================
+   成员标识色点
+   ============================================ */
+.member-bai { color: var(--bai); }
+.member-zhu { color: var(--zhu); }
+.member-cp {
+  background: linear-gradient(135deg, var(--bai) 0%, var(--cp) 50%, var(--zhu) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dot-bai { background-color: var(--bai); box-shadow: 0 0 6px var(--bai-glow); }
+.dot-zhu { background-color: var(--zhu); box-shadow: 0 0 6px var(--zhu-glow); }
+.dot-cp {
+  background: linear-gradient(135deg, var(--bai), var(--cp), var(--zhu));
+  box-shadow: 0 0 8px var(--cp-glow);
+}
+
+/* ============================================
+   口号渐变文字
+   ============================================ */
+.text-gradient-cp {
+  background: linear-gradient(
+    135deg,
+    var(--bai) 0%,
+    var(--cp) 40%,
+    var(--zhu) 70%,
+    var(--cp) 100%
+  );
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 8s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* ============================================
+   同款卡片封面图区域
+   ============================================ */
+.style-cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.style-cover-gradient {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.style-cover-gradient::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
+}
+
+/* 按品类区分封面渐变 */
+.cover-衣服 { background: linear-gradient(135deg, oklch(0.40 0.10 290), oklch(0.55 0.18 280)); }
+.cover-饰品 { background: linear-gradient(135deg, oklch(0.55 0.15 300), oklch(0.70 0.12 260)); }
+.cover-零食 { background: linear-gradient(135deg, oklch(0.50 0.14 50), oklch(0.55 0.18 30)); }
+.cover-美妆 { background: linear-gradient(135deg, oklch(0.55 0.18 330), oklch(0.60 0.15 350)); }
+.cover-鞋包 { background: linear-gradient(135deg, oklch(0.35 0.08 250), oklch(0.50 0.15 270)); }
+.cover-其他 { background: linear-gradient(135deg, oklch(0.35 0.08 285), oklch(0.45 0.12 290)); }
+
+/* ============================================
+   无障碍 / 焦点 / 滚动条
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .cp-atmosphere { animation: none; }
+  .bento-tile { transition: none; }
+  .bento-tile:hover { transform: none; }
+  .text-gradient-cp { animation: none; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--cp);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--background); }
+::-webkit-scrollbar-thumb {
+  background: var(--surface-3);
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--cp); }
+
+/* 选中文字颜色 */
+::selection {
+  background: oklch(0.65 0.22 295 / 0.3);
+  color: var(--foreground);
+}
