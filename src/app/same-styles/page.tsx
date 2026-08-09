@@ -3,33 +3,47 @@
 import { useState } from "react";
 import Image from "next/image";
 import { BentoTile } from "@/components/bento/BentoTile";
+import { DogMascot, PigMascot } from "@/components/mascot/Mascots";
+import { TypeIcon } from "@/components/ui/TypeIcon";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { sameStyles } from "@/lib/velite";
+import { formatDateTime } from "@/lib/date";
 
 const categories = ["全部", "衣服", "饰品", "零食", "美妆", "鞋包", "其他"] as const;
 const members = ["全部", "柏欣妤", "朱怡欣", "双人"] as const;
 type Category = (typeof categories)[number];
 type Member = (typeof members)[number];
+type SortMode = "new" | "priceAsc" | "priceDesc";
 
 const memberToKey: Record<string, "A" | "B" | "both"> = {
   "柏欣妤": "A", "朱怡欣": "B", "双人": "both",
 };
 
-const coverEmoji: Record<string, string> = {
-  "衣服": "\u{1F457}", "饰品": "\u{1F48D}", "零食": "\u{1F36A}", "美妆": "\u{1F484}", "鞋包": "\u{1F45C}", "其他": "\u2728",
-};
-
 const getDot = (m: string) => m === "A" ? "dot-bai" : m === "B" ? "dot-zhu" : "dot-cp";
 const getLabel = (m: string) => m === "A" ? "柏欣妤" : m === "B" ? "朱怡欣" : "双人";
+
+const parsePrice = (price?: string) => {
+  if (!price) return Number.MAX_SAFE_INTEGER;
+  const n = parseFloat(price.replace(/[^\d.]/g, ""));
+  return Number.isNaN(n) ? Number.MAX_SAFE_INTEGER : n;
+};
 
 export default function SameStylesPage() {
   const [activeCat, setActiveCat] = useState<Category>("全部");
   const [activeMember, setActiveMember] = useState<Member>("全部");
+  const [sort, setSort] = useState<SortMode>("new");
 
   const filtered = sameStyles.filter((item) => {
     const catMatch = activeCat === "全部" || item.category === activeCat;
     let memberMatch = true;
     if (activeMember !== "全部") { memberMatch = item.member === memberToKey[activeMember]; }
     return catMatch && memberMatch;
+  });
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sort === "priceAsc") return parsePrice(a.price) - parsePrice(b.price);
+    if (sort === "priceDesc") return parsePrice(b.price) - parsePrice(a.price);
+    return a.date < b.date ? 1 : -1;
   });
 
   return (
@@ -39,6 +53,9 @@ export default function SameStylesPage() {
           <span className="font-mono text-[10px] tracking-[0.35em] text-cp uppercase">
             {"\u00A7"} 01 {"\u00B7"} Same Style
           </span>
+          <span className="h-px flex-1 bg-gradient-to-r from-cp/30 to-transparent" />
+          <DogMascot className="w-5 h-5 opacity-70" />
+          <PigMascot className="w-5 h-5 opacity-70" />
         </div>
         <h1 className="font-serif text-4xl md:text-5xl font-semibold tracking-tight">
           <em className="text-gradient-cp not-italic">同款</em>衣橱
@@ -49,7 +66,7 @@ export default function SameStylesPage() {
       </header>
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -60,6 +77,19 @@ export default function SameStylesPage() {
                   : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground")}
             >
               {cat}
+            </button>
+          ))}
+          <span className="w-px h-5 bg-border mx-1 hidden sm:block" />
+          {(["new", "priceAsc", "priceDesc"] as const).map((mode) => (
+            <button
+              key={mode}
+              onClick={() => setSort(mode)}
+              className={"px-3 py-1 rounded-full text-[10px] font-mono border transition-all duration-200 " +
+                (sort === mode
+                  ? "bg-surface-3 text-foreground border-cp/60"
+                  : "bg-transparent text-muted border-border hover:border-cp/40 hover:text-foreground")}
+            >
+              {mode === "new" ? "最新" : mode === "priceAsc" ? "价格 ↑" : "价格 ↓"}
             </button>
           ))}
         </div>
@@ -87,8 +117,8 @@ export default function SameStylesPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {filtered.map((item) => {
-          const coverClass = "style-cover cover-" + item.category + " mb-0 rounded-none";
+        {sorted.map((item) => {
+          const coverClass = "style-cover cover-" + item.category + " style-cover-shine mb-0 rounded-none";
           return (
             <BentoTile key={item.slug} interactive noPadding className="overflow-hidden group">
               <div className={coverClass}>
@@ -105,9 +135,10 @@ export default function SameStylesPage() {
                   </>
                 ) : (
                   <div className="style-cover-gradient flex items-center justify-center">
-                    <span className="text-6xl opacity-60 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                      {coverEmoji[item.category] || "\u2728"}
-                    </span>
+                    <TypeIcon
+                      name={item.category}
+                      className="w-12 h-12 opacity-60 group-hover:scale-110 transition-transform duration-500 relative z-10"
+                    />
                   </div>
                 )}
                 <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/70 backdrop-blur-sm">
@@ -119,21 +150,28 @@ export default function SameStylesPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-mono text-muted uppercase tracking-wider">{item.category}</span>
                   <span className="text-muted/30 text-[10px]">{"\u00B7"}</span>
-                  <span className="text-[10px] font-mono text-muted/60">{item.date}</span>
+                  <span className="text-[10px] font-mono text-muted/60">{formatDateTime(item.date)}</span>
                 </div>
                 <h3 className="font-serif text-base font-semibold leading-snug group-hover:text-cp transition-colors duration-300">
                   {item.title}
                 </h3>
                 {item.brand && <p className="text-xs text-muted font-mono">{item.brand}</p>}
-                {item.price && <p className="text-xs text-cp font-mono mt-auto">{"\u00A5"}{item.price}</p>}
+                <div className="mt-auto flex items-center justify-between pt-1">
+                  {item.price ? (
+                    <p className="text-xs text-cp font-mono">{"\u00A5"}{item.price}</p>
+                  ) : (
+                    <span />
+                  )}
+                  <TypeIcon name={item.category} className="w-4 h-4 text-muted/30" />
+                </div>
               </div>
             </BentoTile>
           );
         })}
       </div>
 
-      {filtered.length === 0 && (
-        <div className="text-center py-20 text-muted font-mono text-sm">暂无匹配的同款</div>
+      {sorted.length === 0 && (
+        <EmptyState message="暂无匹配的同款" hint="换个筛选条件试试" member="both" />
       )}
     </div>
   );

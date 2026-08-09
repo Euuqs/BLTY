@@ -44,7 +44,10 @@ export default defineConfig({
           description: s.string().optional(),
           body: s.mdx(),
         })
-        .transform((data) => ({ ...data, slug: data.title.toLowerCase().replace(/\s+/g, "-") })),
+        .transform((data) => ({
+          ...data,
+          slug: `${data.date.slice(0, 10)}-${data.title.toLowerCase().replace(/\s+/g, "-")}`,
+        })),
     },
     feeds: {
       name: "Feed",
@@ -56,6 +59,7 @@ export default defineConfig({
           member: s.enum(["A", "B", "both"]),
           type: s.enum(["路透", "日常", "舞台", "采访", "其他"]).optional(),
           description: s.string().optional(),
+          link: s.string().optional(),
           tags: s.array(s.string()).optional(),
           body: s.mdx(),
         })

@@ -26,6 +26,10 @@
   --cp-glow: oklch(0.60 0.25 295);    /* 紫光晕 */
   --cp-soft: oklch(0.50 0.15 290);    /* 柔和紫 */
 
+  /* 粉丝 · 玫瑰红 */
+  --rose: oklch(0.58 0.22 20);
+  --rose-glow: oklch(0.52 0.24 15);
+
   /* 文字层级 */
   --muted: oklch(0.68 0.02 285);
   --border: oklch(0.28 0.04 285);
@@ -50,6 +54,7 @@
   --color-accent-2: var(--zhu);
   --color-muted: var(--muted);
   --color-border: var(--border);
+  --color-rose: var(--rose);
 
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
@@ -167,6 +172,7 @@ body {
   background: linear-gradient(135deg, var(--bai), var(--cp), var(--zhu));
   box-shadow: 0 0 8px var(--cp-glow);
 }
+.dot-rose { background-color: var(--rose); box-shadow: 0 0 6px var(--rose-glow); }
 
 /* ============================================
    口号渐变文字
@@ -190,6 +196,24 @@ body {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
+
+/* ============================================
+   萌宠系统 · 小白狗 & 小猪
+   ============================================ */
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+.mascot-float { animation: mascot-float 6s ease-in-out infinite; }
+.mascot-float-delayed { animation-delay: -3s; }
+
+@keyframes mascot-twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.85) rotate(-10deg); }
+  50% { opacity: 0.95; transform: scale(1.1) rotate(12deg); }
+}
+.twinkle { animation: mascot-twinkle 5s ease-in-out infinite; }
+.twinkle-1 { animation-delay: -1.4s; }
+.twinkle-2 { animation-delay: -3.2s; }
 
 /* ============================================
    同款卡片封面图区域
@@ -227,6 +251,34 @@ body {
 .cover-鞋包 { background: linear-gradient(135deg, oklch(0.35 0.08 250), oklch(0.50 0.15 270)); }
 .cover-其他 { background: linear-gradient(135deg, oklch(0.35 0.08 285), oklch(0.45 0.12 290)); }
 
+/* 分类占比条状图配色 */
+.cover-bar-衣服 { background: oklch(0.65 0.22 295); }
+.cover-bar-饰品 { background: oklch(0.60 0.18 250); }
+.cover-bar-零食 { background: oklch(0.55 0.18 30); }
+.cover-bar-美妆 { background: oklch(0.60 0.20 350); }
+.cover-bar-鞋包 { background: oklch(0.95 0.01 260); }
+.cover-bar-其他 { background: oklch(0.68 0.02 285); }
+
+/* 同款封面 · hover 流光扫过 */
+.style-cover-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    oklch(0.97 0.005 285 / 0.35) 50%,
+    transparent 60%
+  );
+  transform: translateX(-130%);
+  transition: transform 0.8s ease;
+  pointer-events: none;
+}
+.group:hover .style-cover-shine::after {
+  transform: translateX(130%);
+}
+
 /* ============================================
    无障碍 / 焦点 / 滚动条
    ============================================ */
@@ -235,6 +287,9 @@ body {
   .bento-tile { transition: none; }
   .bento-tile:hover { transform: none; }
   .text-gradient-cp { animation: none; }
+  .mascot-float { animation: none; }
+  .twinkle { animation: none; }
+  .style-cover-shine::after { transition: none; transform: none; }
 }
 
 :focus-visible {
