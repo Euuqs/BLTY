@@ -4,13 +4,18 @@ import { DogMascot, PigMascot, Paw, Rose } from "@/components/mascot/Mascots";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BirthdayCountdown } from "@/components/ui/BirthdayCountdown";
 import { Reveal } from "@/components/ui/Reveal";
+import { StatsCharts } from "@/components/bento/StatsCharts";
+import { TagCloud } from "@/components/bento/TagCloud";
 import { sameStyles, schedules, feeds } from "@/lib/velite";
 import { formatMonthDay } from "@/lib/date";
 
 export default function Home() {
   const latestStyles = sameStyles.slice(-4).reverse();
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   const upcoming = schedules
-    .filter((s) => new Date(s.date) >= new Date("2026-08-01"))
+    .filter((s) => s.date.slice(0, 10) >= todayStr)
+    .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, 3);
   const latestFeeds = feeds.slice(-3).reverse();
 
@@ -54,6 +59,14 @@ export default function Home() {
         <BirthdayCountdown />
       </Reveal>
 
+      {/* ===== 数据洞察 + 标签云 ===== */}
+      <Reveal delay={0.05}>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <StatsCharts />
+          <TagCloud />
+        </section>
+      </Reveal>
+
       {/* ===== 成员档案 · 萌宠标志 ===== */}
       <Reveal delay={0.05}>
         <section>
@@ -95,7 +108,7 @@ export default function Home() {
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                   <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-bai/25 text-[10px] font-mono text-bai/90">SNH48</span>
-                  <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-bai/25 text-[10px] font-mono text-bai/90">奶白</span>
+                  <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-bai/25 text-[10px] font-mono text-bai/90">白色</span>
                 </div>
               </div>
             </BentoTile>
@@ -121,7 +134,7 @@ export default function Home() {
                 </p>
                 <div className="flex flex-wrap gap-1.5 mt-4 justify-center">
                   <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-zhu/30 text-[10px] font-mono text-zhu">GNZ48</span>
-                  <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-zhu/30 text-[10px] font-mono text-zhu">海盐蓝</span>
+                  <span className="px-2.5 py-1 rounded-full bg-surface-2 border border-zhu/30 text-[10px] font-mono text-zhu">蓝色</span>
                 </div>
               </div>
             </BentoTile>
@@ -192,7 +205,7 @@ export default function Home() {
       <Reveal delay={0.05}>
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <BentoTile className="col-span-1" interactive>
-            <Link href="/same-styles" className="h-full flex flex-col">
+            <Link href="/same-styles" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 02</span>
                 <span className="text-cp text-sm">{"\u2192"}</span>
@@ -208,7 +221,7 @@ export default function Home() {
           </BentoTile>
 
           <BentoTile className="col-span-1" interactive>
-            <Link href="/schedule" className="h-full flex flex-col">
+            <Link href="/schedule" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 03</span>
                 <span className="text-cp text-sm">{"\u2192"}</span>
@@ -228,7 +241,7 @@ export default function Home() {
           </BentoTile>
 
           <BentoTile className="col-span-1" interactive>
-            <Link href="/feed" className="h-full flex flex-col">
+            <Link href="/feed" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 04</span>
                 <span className="text-cp text-sm">{"\u2192"}</span>

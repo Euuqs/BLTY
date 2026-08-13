@@ -3,6 +3,11 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
 
+function slugify(title: string, date?: string) {
+  const base = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u4e00-\u9fff-]/g, "");
+  return date ? `${date.slice(0, 10)}-${base}` : base;
+}
+
 export default defineConfig({
   root: "content",
   output: {
@@ -28,7 +33,7 @@ export default defineConfig({
           tags: s.array(s.string()).optional(),
           body: s.mdx(),
         })
-        .transform((data) => ({ ...data, slug: data.title.toLowerCase().replace(/\s+/g, "-") })),
+        .transform((data) => ({ ...data, slug: slugify(data.title, data.date) })),
     },
     schedules: {
       name: "Schedule",
@@ -46,7 +51,7 @@ export default defineConfig({
         })
         .transform((data) => ({
           ...data,
-          slug: `${data.date.slice(0, 10)}-${data.title.toLowerCase().replace(/\s+/g, "-")}`,
+          slug: slugify(data.title, data.date),
         })),
     },
     feeds: {
@@ -63,7 +68,7 @@ export default defineConfig({
           tags: s.array(s.string()).optional(),
           body: s.mdx(),
         })
-        .transform((data) => ({ ...data, slug: data.title.toLowerCase().replace(/\s+/g, "-") })),
+        .transform((data) => ({ ...data, slug: slugify(data.title, data.date) })),
     },
   },
   markdown: {

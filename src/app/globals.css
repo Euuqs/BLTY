@@ -18,9 +18,9 @@
   --surface-3: oklch(0.27 0.04 285);
 
   /* 三色体系 */
-  --bai: oklch(0.95 0.005 260);       /* 柏欣妤 · 星光白 */
+  --bai: oklch(0.95 0.005 260);       /* 柏欣妤 · 白色 */
   --bai-glow: oklch(0.92 0.01 260);   /* 白光晕 */
-  --zhu: oklch(0.60 0.18 250);        /* 朱怡欣 · 心动蓝 */
+  --zhu: oklch(0.60 0.18 250);        /* 朱怡欣 · 蓝色 */
   --zhu-glow: oklch(0.55 0.20 250);   /* 蓝光晕 */
   --cp: oklch(0.65 0.22 295);         /* 柏里挑怡 · 交融紫 */
   --cp-glow: oklch(0.60 0.25 295);    /* 紫光晕 */
@@ -67,7 +67,29 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   overflow-x: hidden;
+  min-height: 100dvh;
+}
+
+/* 移动端触摸优化 */
+@media (hover: none) and (pointer: coarse) {
+  .ripple-container {
+    -webkit-touch-callout: none;
+  }
+}
+
+/* 确保所有图片和媒体不溢出容器 */
+img, video, svg {
+  max-width: 100%;
+}
+
+/* 安全区域适配（刘海屏等） */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 
 /* ============================================
@@ -286,6 +308,9 @@ body {
   .cp-atmosphere { animation: none; }
   .bento-tile { transition: none; }
   .bento-tile:hover { transform: none; }
+  .bento-tile-interactive { transition: none; }
+  .bento-tile-interactive:hover,
+  .bento-tile-interactive:active { transform: none; }
   .text-gradient-cp { animation: none; }
   .mascot-float { animation: none; }
   .twinkle { animation: none; }
@@ -310,4 +335,473 @@ body {
 ::selection {
   background: oklch(0.65 0.22 295 / 0.3);
   color: var(--foreground);
+}
+
+/* ============================================
+   正反馈 · 微交互动画
+   ============================================ */
+
+/* 按钮按压效果 */
+.btn-press {
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.15s ease;
+}
+.btn-press:active {
+  transform: scale(0.96);
+}
+
+/* 卡片点击涟漪容器 */
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: oklch(0.65 0.22 295 / 0.35);
+  transform: scale(0);
+  animation: ripple-animation 0.6s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* 爱心飘出动画 */
+@keyframes heart-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-40px) scale(1.2) rotate(-10deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-80px) scale(0.8) rotate(10deg);
+  }
+}
+
+.heart-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: heart-float 1.2s ease-out forwards;
+  font-size: 1.25rem;
+}
+
+/* 星星闪烁粒子 */
+@keyframes sparkle-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5) rotate(360deg) translateY(-30px);
+  }
+}
+
+.sparkle-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  animation: sparkle-burst 0.8s ease-out forwards;
+}
+
+/* 数字计数动画 */
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.count-animate {
+  animation: count-up 0.5s ease-out;
+}
+
+/* 卡片光泽扫过增强 */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    oklch(0.97 0.005 285 / 0.08) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+/* 脉冲发光效果 */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px oklch(0.65 0.22 295 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.65 0.22 295 / 0.6),
+                0 0 40px oklch(0.60 0.18 250 / 0.3);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* 弹跳进入动画 */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.bounce-in {
+  animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 庆祝彩纸 */
+@keyframes confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translateY(-100vh) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(720deg);
+  }
+}
+
+.confetti-piece {
+  position: fixed;
+  top: -20px;
+  pointer-events: none;
+  z-index: 9998;
+  animation: confetti-fall 3s ease-in forwards;
+}
+
+/* 柔和呼吸动画 */
+@keyframes soft-breathe {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.soft-breathe {
+  animation: soft-breathe 3s ease-in-out infinite;
+}
+
+/* 链接箭头动画 */
+@keyframes arrow-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+.group:hover .arrow-hover {
+  animation: arrow-nudge 0.6s ease-in-out infinite;
+}
+
+/* 标签悬浮微颤 */
+@keyframes tag-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2deg); }
+  75% { transform: rotate(2deg); }
+}
+
+.tag-hover:hover {
+  animation: tag-wiggle 0.4s ease-in-out;
+}
+
+/* 图片加载骨架屏 */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--surface-3) 50%,
+    var(--surface-2) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* 萌宠点击跳动 */
+@keyframes mascot-bounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-5deg); }
+  50% { transform: scale(0.95) rotate(3deg); }
+  75% { transform: scale(1.08) rotate(-2deg); }
+}
+
+.mascot-clicked {
+  animation: mascot-bounce 0.5s ease-in-out;
+}
+
+/* 渐变边框流动 */
+@keyframes gradient-border {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    var(--bai),
+    var(--cp),
+    var(--zhu),
+    var(--cp),
+    var(--bai)
+  );
+  background-size: 300% 300%;
+  animation: gradient-border 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* 页面切换过渡 */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* 工具提示样式 */
+.tooltip {
+  position: relative;
+}
+
+.tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  padding: 6px 12px;
+  background: var(--surface-3);
+  color: var(--foreground);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  border: 1px solid var(--border);
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+/* 增强 Bento 卡片悬停效果 */
+.bento-tile-enhanced {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 0.4s ease,
+              box-shadow 0.4s ease,
+              background 0.4s ease;
+}
+
+.bento-tile-enhanced:hover {
+  transform: translateY(-4px) scale(1.015);
+}
+
+/* 链接型卡片：原生 a 标签的点击反馈（替代 framer-motion whileTap） */
+.bento-tile-interactive {
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+              border-color 0.4s ease,
+              box-shadow 0.4s ease,
+              background 0.4s ease;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.bento-tile-interactive:hover {
+  transform: translateY(-4px) scale(1.015);
+}
+
+.bento-tile-interactive:active {
+  transform: translateY(-1px) scale(0.98);
+  transition-duration: 0.1s;
+}
+
+/* 搜索结果定位高亮 */
+@keyframes search-highlight {
+  0% { box-shadow: 0 0 0 0 oklch(0.65 0.22 295 / 0.6), 0 0 30px oklch(0.65 0.22 295 / 0.3); }
+  50% { box-shadow: 0 0 0 6px oklch(0.65 0.22 295 / 0.15), 0 0 40px oklch(0.65 0.22 295 / 0.4); }
+  100% { box-shadow: 0 0 0 0 oklch(0.65 0.22 295 / 0), 0 0 0 transparent; }
+}
+
+:target {
+  animation: search-highlight 1.5s ease-out;
+  scroll-margin-top: 6rem;
+  border-radius: 1.25rem;
+}
+
+/* 进度条动画 */
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+
+.progress-animate {
+  animation: progress-fill 1s ease-out;
+}
+
+/* ============================================
+   浅色主题
+   ============================================ */
+html.light-theme {
+  --background: oklch(0.97 0.01 285);
+  --foreground: oklch(0.18 0.02 285);
+  --surface: oklch(0.99 0.005 285);
+  --surface-2: oklch(0.95 0.01 285);
+  --surface-3: oklch(0.90 0.015 285);
+  --bai: oklch(0.45 0.02 260);
+  --bai-glow: oklch(0.50 0.03 260);
+  --zhu: oklch(0.50 0.18 250);
+  --zhu-glow: oklch(0.45 0.20 250);
+  --cp: oklch(0.55 0.22 295);
+  --cp-glow: oklch(0.50 0.25 295);
+  --cp-soft: oklch(0.60 0.15 290);
+  --rose: oklch(0.55 0.22 20);
+  --muted: oklch(0.45 0.02 285);
+  --border: oklch(0.88 0.02 285);
+  --border-glow: oklch(0.60 0.12 290);
+}
+
+html.light-theme body {
+  background: var(--background);
+}
+
+html.light-theme .cp-atmosphere {
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 15%, oklch(0.60 0.18 250 / 0.12), transparent 65%),
+    radial-gradient(ellipse 80% 60% at 85% 25%, oklch(0.45 0.02 260 / 0.05), transparent 60%),
+    radial-gradient(ellipse 70% 80% at 50% 90%, oklch(0.65 0.22 295 / 0.10), transparent 70%);
+}
+
+html.light-theme .bento-tile {
+  box-shadow: 0 2px 12px oklch(0.50 0.15 290 / 0.08);
+}
+
+html.light-theme .bento-tile:hover {
+  box-shadow:
+    0 0 0 1px oklch(0.55 0.22 295 / 0.2),
+    0 20px 50px -20px oklch(0.55 0.22 295 / 0.25);
+}
+
+html.light-theme .style-cover-gradient::after {
+  background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
+}
+
+html.light-theme .cp-stars {
+  opacity: 0.3;
+}
+
+/* 移动端手势提示 */
+.swipe-hint {
+  position: relative;
+  overflow: hidden;
+}
+
+.swipe-hint::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -100%;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--cp), transparent);
+  animation: swipe-hint 2s ease-in-out infinite;
+}
+
+@keyframes swipe-hint {
+  0% { left: -100%; }
+  100% { left: 150%; }
+}
+
+/* 搜索高亮 */
+mark.search-highlight {
+  background: oklch(0.65 0.22 295 / 0.25);
+  color: inherit;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .ripple { animation: none; }
+  .heart-particle { animation: none; }
+  .sparkle-particle { animation: none; }
+  .bounce-in { animation: none; }
+  .confetti-piece { animation: none; }
+  .pulse-glow { animation: none; }
+  .soft-breathe { animation: none; }
+  .arrow-hover { animation: none; }
+  .tag-hover:hover { animation: none; }
+  .mascot-clicked { animation: none; }
+  .gradient-border::before { animation: none; }
+  .swipe-hint::after { animation: none; }
 }
