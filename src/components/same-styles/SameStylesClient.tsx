@@ -10,8 +10,10 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 import { Lightbox } from "@/components/ui/Lightbox";
 import { DetailModal } from "@/components/ui/DetailModal";
-import { sameStyles } from "@/lib/velite";
+import type { SameStyle } from "@/lib/velite";
 import { formatDateTime } from "@/lib/date";
+
+type SameStyleItem = SameStyle;
 
 const categories = ["全部", "衣服", "饰品", "零食", "美妆", "鞋包", "其他"] as const;
 const members = ["全部", "柏欣妤", "朱怡欣", "双人"] as const;
@@ -72,19 +74,19 @@ function FilterButton({
   );
 }
 
-export function SameStylesClient() {
+export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
   const [activeCat, setActiveCat] = useState<Category>("全部");
   const [activeMember, setActiveMember] = useState<Member>("全部");
   const [sort, setSort] = useState<SortMode>("new");
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-  const [detailItem, setDetailItem] = useState<(typeof sameStyles)[number] | null>(null);
+  const [detailItem, setDetailItem] = useState<SameStyleItem | null>(null);
 
-  const filtered = useMemo(() => sameStyles.filter((item) => {
+  const filtered = useMemo(() => items.filter((item) => {
     const catMatch = activeCat === "全部" || item.category === activeCat;
     let memberMatch = true;
     if (activeMember !== "全部") { memberMatch = item.member === memberToKey[activeMember]; }
     return catMatch && memberMatch;
-  }), [activeCat, activeMember]);
+  }), [items, activeCat, activeMember]);
 
   const sorted = useMemo(() => [...filtered].sort((a, b) => {
     if (sort === "priceAsc") return parsePrice(a.price) - parsePrice(b.price);
@@ -302,7 +304,7 @@ export function SameStylesClient() {
                 date: detailItem.date,
                 price: detailItem.price,
                 image: detailItem.cover,
-                bodyCode: detailItem.body,
+                bodyHtml: detailItem.html,
                 tags: detailItem.tags,
               }
             : null

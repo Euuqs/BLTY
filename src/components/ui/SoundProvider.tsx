@@ -37,8 +37,10 @@ export function SoundProvider({ children }: { children: ReactNode }) {
   const ctxRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("cp-sound");
-    if (saved === "true") setEnabled(true);
+    queueMicrotask(() => {
+      const saved = localStorage.getItem("cp-sound");
+      if (saved === "true") setEnabled(true);
+    });
   }, []);
 
   const ensureContext = useCallback(() => {

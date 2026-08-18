@@ -86,6 +86,20 @@ export function Navigation() {
           <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border/50">
             <SearchPalette />
             <div className="hidden sm:flex items-center gap-1.5">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={(e) => {
+                  createRipple(e);
+                  window.dispatchEvent(new Event("open-feedback"));
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface/50 border border-border text-muted text-xs font-mono hover:border-cp/40 hover:text-foreground transition-all btn-press ripple-container"
+                aria-label="提意见"
+                title="意见箱"
+              >
+                <span>{"\u{1F4A1}"}</span>
+                <span className="hidden md:inline">意见</span>
+              </motion.button>
               <ThemeToggle />
               <SoundToggle />
             </div>

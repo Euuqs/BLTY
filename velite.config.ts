@@ -2,10 +2,23 @@ import { defineConfig, s } from "velite";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import remarkGfm from "remark-gfm";
+import { createElement } from "react";
+import { jsx } from "react/jsx-runtime";
+import { renderToStaticMarkup } from "react-dom/server";
 
 function slugify(title: string, date?: string) {
   const base = title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w\u4e00-\u9fff-]/g, "");
   return date ? `${date.slice(0, 10)}-${base}` : base;
+}
+
+function mdxToHtml(code: string): string {
+  try {
+    const fn = new Function(code);
+    const Content = fn({ jsx }).default;
+    return renderToStaticMarkup(createElement(Content));
+  } catch {
+    return "";
+  }
 }
 
 export default defineConfig({
@@ -33,7 +46,14 @@ export default defineConfig({
           tags: s.array(s.string()).optional(),
           body: s.mdx(),
         })
-        .transform((data) => ({ ...data, slug: slugify(data.title, data.date) })),
+        .transform((data) => {
+          const { body, ...rest } = data;
+          return {
+            ...rest,
+            slug: slugify(data.title, data.date),
+            html: mdxToHtml(body),
+          };
+        }),
     },
     schedules: {
       name: "Schedule",

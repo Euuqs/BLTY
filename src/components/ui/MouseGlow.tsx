@@ -12,13 +12,13 @@ export function MouseGlow() {
   const springY = useSpring(y, { stiffness: 200, damping: 30 });
 
   useEffect(() => {
-    setIsTouch(window.matchMedia("(pointer: coarse)").matches);
-  }, []);
-
-  useEffect(() => {
     if (isTouch) return;
 
     const handleMove = (e: MouseEvent) => {
+      if (window.matchMedia("(pointer: coarse)").matches) {
+        setIsTouch(true);
+        return;
+      }
       x.set(e.clientX);
       y.set(e.clientY);
       if (!visible) setVisible(true);

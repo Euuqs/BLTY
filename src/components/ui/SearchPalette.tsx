@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
-import { sameStyles, schedules, feeds } from "@/lib/velite";
 import { useFeedback } from "./FeedbackProvider";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 type SearchResult = {
   type: "same-style" | "schedule" | "feed";
@@ -22,10 +22,15 @@ function getDot(m: string) {
 export function SearchPalette() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const searchSeq = useRef(0);
   const { createRipple, spawnParticles } = useFeedback();
+  useFocusTrap(panelRef, open);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -52,7 +57,32 @@ export function SearchPalette() {
   }, [open]);
 
   useEffect(() => {
-    setActiveIndex(0);
+    const q = query.trim().toLowerCase();
+    if (!q) return;
+    const seq = ++searchSeq.current;
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      if (!controller.signal.aborted) setLoading(true);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`, {
+          signal: controller.signal,
+        });
+        const data: SearchResult[] = await res.json();
+        if (searchSeq.current === seq) {
+          setResults(data);
+          setLoading(false);
+        }
+      } catch {
+        if (searchSeq.current === seq) {
+          setResults([]);
+          setLoading(false);
+        }
+      }
+    }, 200);
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [query]);
 
   useEffect(() => {
@@ -60,61 +90,6 @@ export function SearchPalette() {
     const el = listRef.current?.querySelector<HTMLElement>(`[data-index="${activeIndex}"]`);
     el?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, open]);
-
-  const results = useMemo<SearchResult[]>(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
-    const r: SearchResult[] = [];
-
-    sameStyles.forEach((s) => {
-      if (
-        s.title.toLowerCase().includes(q) ||
-        s.brand?.toLowerCase().includes(q) ||
-        s.category.toLowerCase().includes(q)
-      ) {
-        r.push({
-          type: "same-style",
-          title: s.title,
-          subtitle: s.brand || s.category,
-          href: `/same-styles#${encodeURIComponent(s.slug)}`,
-          slug: s.slug,
-          member: s.member,
-        });
-      }
-    });
-
-    schedules.forEach((s) => {
-      if (s.title.toLowerCase().includes(q) || s.location?.toLowerCase().includes(q)) {
-        r.push({
-          type: "schedule",
-          title: s.title,
-          subtitle: s.date + (s.time ? " " + s.time : ""),
-          href: `/schedule#${encodeURIComponent(s.slug)}`,
-          slug: s.slug,
-          member: s.member,
-        });
-      }
-    });
-
-    feeds.forEach((f) => {
-      if (
-        f.title.toLowerCase().includes(q) ||
-        f.description?.toLowerCase().includes(q) ||
-        f.tags?.some((t) => t.toLowerCase().includes(q))
-      ) {
-        r.push({
-          type: "feed",
-          title: f.title,
-          subtitle: f.description?.slice(0, 40),
-          href: `/feed#${encodeURIComponent(f.slug)}`,
-          slug: f.slug,
-          member: f.member,
-        });
-      }
-    });
-
-    return r.slice(0, 12);
-  }, [query]);
 
   const typeLabels: Record<string, string> = {
     "same-style": "同款",
@@ -135,6 +110,7 @@ export function SearchPalette() {
         whileTap={{ scale: 0.95 }}
         onClick={(e) => {
           createRipple(e);
+          setActiveIndex(0);
           setOpen(true);
         }}
         className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border text-muted text-xs font-mono hover:border-cp/40 hover:text-foreground transition-all btn-press"
@@ -161,6 +137,7 @@ export function SearchPalette() {
               exit={{ opacity: 0, y: -20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               onClick={(e) => e.stopPropagation()}
+              ref={panelRef}
               className="w-full max-w-xl bento-tile p-0 overflow-hidden"
             >
               <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
@@ -168,7 +145,12 @@ export function SearchPalette() {
                 <input
                   ref={inputRef}
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setQuery(value);
+                    setActiveIndex(0);
+                    if (!value.trim()) setResults([]);
+                  }}
                   onKeyDown={(e) => {
                     if (e.key === "ArrowDown") {
                       e.preventDefault();
@@ -203,7 +185,12 @@ export function SearchPalette() {
                     <p className="text-xs mt-1 text-muted/60">试试：Adidas、生日、广州</p>
                   </div>
                 )}
-                {query && results.length === 0 && (
+                {query && loading && (
+                  <div className="py-8 text-center text-muted text-sm">
+                    <p>搜索中...</p>
+                  </div>
+                )}
+                {query && !loading && results.length === 0 && (
                   <div className="py-8 text-center text-muted text-sm">
                     <p>未找到相关结果</p>
                     <p className="text-xs mt-1 text-muted/60">换个关键词试试</p>
@@ -229,6 +216,7 @@ export function SearchPalette() {
                       );
                       setOpen(false);
                       setQuery("");
+                      setResults([]);
                     }}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors group ${
                       i === activeIndex ? "bg-surface-2/70" : "hover:bg-surface-2/50"

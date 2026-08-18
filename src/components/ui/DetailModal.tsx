@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
 import { useFeedback } from "./FeedbackProvider";
 import { MdxRenderer } from "./MdxRenderer";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 interface DetailItem {
   title: string;
@@ -16,7 +17,7 @@ interface DetailItem {
   link?: string;
   image?: string;
   description?: string;
-  bodyCode?: string;
+  bodyHtml?: string;
   tags?: string[];
 }
 
@@ -28,6 +29,8 @@ interface DetailModalProps {
 
 export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
   const { spawnParticles, createRipple } = useFeedback();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, !!item);
 
   useEffect(() => {
     if (item) {
@@ -61,6 +64,7 @@ export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
             exit={{ scale: 0.95, y: 40, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             onClick={(e) => e.stopPropagation()}
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label={item.title}
@@ -106,10 +110,10 @@ export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
                 <p className="text-sm text-muted leading-relaxed">{item.description}</p>
               )}
 
-              {item.bodyCode && (
+              {item.bodyHtml && (
                 <MdxRenderer
-                  code={item.bodyCode}
-                  className="text-sm text-muted/90 leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&>a]:text-cp [&>a:underline] [&>ul]:list-disc [&>ul]:pl-4 [&>strong]:text-foreground"
+                  html={item.bodyHtml}
+                  className="text-sm text-muted/90 leading-relaxed [&>p]:mb-2 [&>p:last-child]:mb-0 [&>a]:text-cp [&>a]:underline [&>ul]:list-disc [&>ul]:pl-4 [&>strong]:text-foreground"
                 />
               )}
 

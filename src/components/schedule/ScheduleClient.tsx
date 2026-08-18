@@ -87,9 +87,25 @@ function CalendarGrid({
         return (
           <div
             key={dateStr}
+            role="button"
+            tabIndex={hasEvents ? 0 : -1}
+            aria-label={`${year}年${month}月${day}日${hasEvents ? `，${dayItems.length}项行程` : "，无行程"}`}
             onClick={(e) => {
               if (hasEvents) {
                 createRipple(e);
+                onSelectDate(isSelected ? null : dateStr);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (!hasEvents) return;
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                const rect = e.currentTarget.getBoundingClientRect();
+                createRipple({
+                  currentTarget: e.currentTarget,
+                  clientX: rect.left + rect.width / 2,
+                  clientY: rect.top + rect.height / 2,
+                } as unknown as React.MouseEvent<HTMLElement>);
                 onSelectDate(isSelected ? null : dateStr);
               }
             }}

@@ -8,6 +8,7 @@ import { Navigation } from "@/components/layout/Navigation";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { FeedbackProvider } from "@/components/ui/FeedbackProvider";
+import { FeedbackModal } from "@/components/ui/FeedbackModal";
 import { FooterMascots } from "@/components/layout/FooterMascots";
 import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { SoundProvider } from "@/components/ui/SoundProvider";
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
     description: "柏欣妤 × 朱怡欣 同款 · 行程 · 动态 应援站",
     images: [
       {
-        url: "/hero-wedding.jpg",
+        url: "/hero-wedding-og.jpg",
         width: 1200,
         height: 630,
         alt: "柏里挑怡",
@@ -52,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "柏里挑怡 · 心动穿越千里",
     description: "柏欣妤 × 朱怡欣 同款 · 行程 · 动态 应援站",
-    images: ["/hero-wedding.jpg"],
+    images: ["/hero-wedding-og.jpg"],
   },
   icons: {
     icon: "/favicon.ico",
@@ -66,6 +67,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN" className="h-full" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light")}catch(e){}`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans">
         <ThemeProvider>
           <SoundProvider>
@@ -89,6 +97,7 @@ export default function RootLayout({
                   </p>
                 </footer>
                 <BackToTop />
+                <FeedbackModal />
                 <EasterEggs />
               </FeedbackProvider>
             </MotionConfig>

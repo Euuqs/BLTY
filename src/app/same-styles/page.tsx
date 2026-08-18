@@ -1,3 +1,4 @@
+import { sameStyles } from "@/lib/velite";
 import { SameStylesClient } from "@/components/same-styles/SameStylesClient";
 
 export const metadata = {
@@ -6,5 +7,5 @@ export const metadata = {
 };
 
 export default function SameStylesPage() {
-  return <SameStylesClient />;
+  return <SameStylesClient items={sameStyles} />;
 }

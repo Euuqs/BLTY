@@ -16,9 +16,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("cp-theme") as Theme | null;
-    if (saved) setTheme(saved);
-    setMounted(true);
+    queueMicrotask(() => {
+      const saved = localStorage.getItem("cp-theme") as Theme | null;
+      if (saved) setTheme(saved);
+      setMounted(true);
+    });
   }, []);
 
   useEffect(() => {

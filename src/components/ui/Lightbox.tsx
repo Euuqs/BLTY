@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useCallback, useState, useRef } from "react";
+import { useEffect, useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 
 interface LightboxProps {
   src: string | null;
@@ -13,9 +14,49 @@ interface LightboxProps {
   hasMultiple?: boolean;
 }
 
-export function Lightbox({ src, alt, onClose, onPrev, onNext, hasMultiple }: LightboxProps) {
+function ZoomableImage({ src, alt, hasMultiple }: { src: string; alt: string; hasMultiple: boolean }) {
   const [scale, setScale] = useState(1);
+
+  const handleWheel = (e: React.WheelEvent) => {
+    e.stopPropagation();
+    setScale((s) => Math.min(3, Math.max(0.5, s - e.deltaY * 0.001)));
+  };
+
+  return (
+    <>
+      <div className="relative" onWheel={handleWheel}>
+        <div className="relative" style={{ transform: `scale(${scale})`, transition: "transform 0.2s" }}>
+          <Image
+            src={src}
+            alt={alt}
+            width={1200}
+            height={900}
+            className="max-w-[85vw] max-h-[80vh] object-contain rounded-lg"
+            unoptimized
+          />
+        </div>
+      </div>
+      <div className="flex items-center justify-center gap-3 mt-3">
+        <p className="text-center text-white/70 text-sm font-mono">
+          {alt}
+          {scale !== 1 && (
+            <span className="ml-2 text-cp">{Math.round(scale * 100)}%</span>
+          )}
+        </p>
+        {hasMultiple && (
+          <p className="text-white/40 text-[10px] font-mono sm:hidden">
+            左右滑动切换
+          </p>
+        )}
+      </div>
+    </>
+  );
+}
+
+export function Lightbox({ src, alt, onClose, onPrev, onNext, hasMultiple }: LightboxProps) {
   const touchStart = useRef<{ x: number; y: number; time: number } | null>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, !!src);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
@@ -30,7 +71,6 @@ export function Lightbox({ src, alt, onClose, onPrev, onNext, hasMultiple }: Lig
     if (src) {
       document.addEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "hidden";
-      setScale(1);
     }
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -71,6 +111,10 @@ export function Lightbox({ src, alt, onClose, onPrev, onNext, hasMultiple }: Lig
           onClick={onClose}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label={alt}
           className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
         >
           <motion.button
@@ -123,34 +167,8 @@ export function Lightbox({ src, alt, onClose, onPrev, onNext, hasMultiple }: Lig
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
             className="relative max-w-full max-h-full"
-            onWheel={(e) => {
-              e.stopPropagation();
-              setScale((s) => Math.min(3, Math.max(0.5, s - e.deltaY * 0.001)));
-            }}
           >
-            <div className="relative" style={{ transform: `scale(${scale})`, transition: "transform 0.2s" }}>
-              <Image
-                src={src}
-                alt={alt}
-                width={1200}
-                height={900}
-                className="max-w-[85vw] max-h-[80vh] object-contain rounded-lg"
-                unoptimized
-              />
-            </div>
-            <div className="flex items-center justify-center gap-3 mt-3">
-              <p className="text-center text-white/70 text-sm font-mono">
-                {alt}
-                {scale !== 1 && (
-                  <span className="ml-2 text-cp">{Math.round(scale * 100)}%</span>
-                )}
-              </p>
-              {hasMultiple && (
-                <p className="text-white/40 text-[10px] font-mono sm:hidden">
-                  左右滑动切换
-                </p>
-              )}
-            </div>
+            <ZoomableImage key={src} src={src} alt={alt} hasMultiple={!!hasMultiple} />
           </motion.div>
         </motion.div>
       )}
