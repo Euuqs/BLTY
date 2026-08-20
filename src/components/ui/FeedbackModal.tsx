@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useFeedback } from "./FeedbackProvider";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { Envelope, Heart } from "@/components/mascot/Mascots";
 
 const MAX_CONTENT = 500;
 const COOLDOWN_MS = 60_000;
@@ -125,20 +126,19 @@ export function FeedbackModal() {
 
   return (
     <>
-      {/* 悬浮入口 */}
+      {/* 悬浮入口（左下角，与右下角回顶部成对） */}
       <motion.button
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ scale: 1.05, y: -2 }}
-        whileTap={{ scale: 0.92 }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
         onClick={handleOpen}
-        className="fixed bottom-24 right-4 md:bottom-24 md:right-8 z-50 group ripple-container overflow-hidden"
+        className="fixed bottom-6 left-4 md:bottom-8 md:left-8 z-[60] group btn-press"
         aria-label="提意见"
+        title="提意见"
+        style={{ pointerEvents: "auto" }}
       >
-        <div className="flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-gradient-to-br from-cp/80 to-zhu/80 backdrop-blur text-sm text-white shadow-glow border border-white/10 btn-press">
-          <span>{"\u{1F4A1}"}</span>
-          <span className="font-mono text-[10px] tracking-wider">提意见</span>
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-rose/90 to-cp/90 backdrop-blur text-white shadow-glow border border-white/15 overflow-hidden hover:scale-110 hover:-translate-y-1 transition-transform duration-200">
+          <Envelope className="w-5 h-5" />
         </div>
       </motion.button>
 
@@ -167,7 +167,7 @@ export function FeedbackModal() {
               <div className="p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg">{"\u{1F4E8}"}</span>
+                    <Envelope className="w-5 h-5 text-cp" />
                     <h2 className="font-serif text-xl font-semibold">意见箱</h2>
                   </div>
                   <motion.button
@@ -281,11 +281,15 @@ export function FeedbackModal() {
                         disabled={status === "submitting" || remainingCooldown > 0}
                         className="w-full px-4 py-3 rounded-xl bg-gradient-to-r from-bai to-zhu text-white text-sm font-bold btn-press disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        {status === "submitting"
-                          ? "提交中…"
-                          : remainingCooldown > 0
-                            ? `${remainingCooldown} 秒后可再次提交`
-                            : `提交意见 {"\u2764"}`}
+                        {status === "submitting" ? (
+                          "提交中…"
+                        ) : remainingCooldown > 0 ? (
+                          `${remainingCooldown} 秒后可再次提交`
+                        ) : (
+                          <>
+                            提交意见 <Heart className="w-4 h-4 inline align-[-2px]" />
+                          </>
+                        )}
                       </motion.button>
                       <p className="text-center text-[10px] text-muted/50 mt-2 font-mono">
                         匿名提交 {"\u00B7"} 仅用于本站改进

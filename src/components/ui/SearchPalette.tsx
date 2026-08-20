@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import { useFeedback } from "./FeedbackProvider";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { ArrowUpRight } from "@/components/mascot/Mascots";
 
 type SearchResult = {
   type: "same-style" | "schedule" | "feed";
@@ -236,9 +237,7 @@ export function SearchPalette() {
                         <p className="text-[10px] text-muted truncate">{r.subtitle}</p>
                       )}
                     </div>
-                    <span className="text-muted text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                      {"\u2197"}
-                    </span>
+                    <ArrowUpRight className="w-4 h-4 text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
                 ))}
               </div>

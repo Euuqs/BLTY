@@ -26,6 +26,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!mounted) return;
     document.documentElement.classList.toggle("light-theme", theme === "light");
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", theme === "light" ? "#f6f4fb" : "#120d20");
     localStorage.setItem("cp-theme", theme);
   }, [theme, mounted]);
 

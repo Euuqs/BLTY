@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useFeedback } from "./FeedbackProvider";
 import { MdxRenderer } from "./MdxRenderer";
 import { useFocusTrap } from "@/lib/useFocusTrap";
+import { ArrowUpRight } from "@/components/mascot/Mascots";
 
 interface DetailItem {
   title: string;
@@ -166,7 +167,7 @@ export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
                     }}
                     className="flex-1 px-4 py-3 sm:py-2.5 rounded-lg bg-gradient-to-r from-bai to-zhu text-white text-sm font-bold text-center btn-press"
                   >
-                    查看来源 {"\u2197"}
+                    查看来源 <ArrowUpRight className="w-4 h-4 inline" />
                   </motion.a>
                 )}
                 <motion.button

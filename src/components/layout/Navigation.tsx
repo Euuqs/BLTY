@@ -13,6 +13,7 @@ const navItems = [
   { href: "/same-styles", label: "同款", mono: "01" },
   { href: "/schedule", label: "行程", mono: "02" },
   { href: "/feed", label: "动态", mono: "03" },
+  { href: "/tour", label: "巡演", mono: "05" },
 ];
 
 export function Navigation() {

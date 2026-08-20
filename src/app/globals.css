@@ -39,6 +39,7 @@
   --font-serif: "Fraunces", Georgia, "Noto Serif SC", serif;
   --font-sans: "Manrope", "Noto Sans SC", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-script: "Great Vibes", cursive;
 }
 
 @theme inline {
@@ -59,6 +60,7 @@
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
+  --font-script: var(--font-script);
 }
 
 body {
@@ -341,6 +343,19 @@ img, video, svg {
    正反馈 · 微交互动画
    ============================================ */
 
+/* 浮动按钮投影（cp 紫光晕） */
+.shadow-glow {
+  box-shadow:
+    0 0 20px oklch(0.65 0.22 295 / 0.30),
+    0 8px 24px -8px oklch(0.50 0.20 290 / 0.45);
+}
+
+html.light-theme .shadow-glow {
+  box-shadow:
+    0 0 16px oklch(0.55 0.22 295 / 0.22),
+    0 8px 20px -8px oklch(0.50 0.20 290 / 0.30);
+}
+
 /* 按钮按压效果 */
 .btn-press {
   transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
@@ -435,36 +450,25 @@ img, video, svg {
   animation: count-up 0.5s ease-out;
 }
 
-/* 卡片光泽扫过增强 */
+/* 卡片光泽扫过增强(仅骨架屏 shimmer 使用,类已无引用) */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
 
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    oklch(0.97 0.005 285 / 0.08) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-/* 脉冲发光效果 */
+/* 脉冲发光效果(倒计时高亮 · 低频柔化,避免干扰阅读) */
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 8px oklch(0.65 0.22 295 / 0.3);
+    box-shadow: 0 0 8px oklch(0.65 0.22 295 / 0.25);
   }
   50% {
-    box-shadow: 0 0 20px oklch(0.65 0.22 295 / 0.6),
-                0 0 40px oklch(0.60 0.18 250 / 0.3);
+    box-shadow: 0 0 14px oklch(0.65 0.22 295 / 0.35),
+                0 0 28px oklch(0.60 0.18 250 / 0.2);
   }
 }
 
 .pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
+  animation: pulse-glow 4s ease-in-out infinite;
 }
 
 /* 弹跳进入动画 */
@@ -507,22 +511,6 @@ img, video, svg {
   pointer-events: none;
   z-index: 9998;
   animation: confetti-fall 3s ease-in forwards;
-}
-
-/* 柔和呼吸动画 */
-@keyframes soft-breathe {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-}
-
-.soft-breathe {
-  animation: soft-breathe 3s ease-in-out infinite;
 }
 
 /* 链接箭头动画 */
@@ -760,28 +748,6 @@ html.light-theme .cp-stars {
   opacity: 0.3;
 }
 
-/* 移动端手势提示 */
-.swipe-hint {
-  position: relative;
-  overflow: hidden;
-}
-
-.swipe-hint::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: -100%;
-  width: 60%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--cp), transparent);
-  animation: swipe-hint 2s ease-in-out infinite;
-}
-
-@keyframes swipe-hint {
-  0% { left: -100%; }
-  100% { left: 150%; }
-}
-
 /* 搜索高亮 */
 mark.search-highlight {
   background: oklch(0.65 0.22 295 / 0.25);
@@ -798,10 +764,8 @@ mark.search-highlight {
   .bounce-in { animation: none; }
   .confetti-piece { animation: none; }
   .pulse-glow { animation: none; }
-  .soft-breathe { animation: none; }
   .arrow-hover { animation: none; }
   .tag-hover:hover { animation: none; }
   .mascot-clicked { animation: none; }
   .gradient-border::before { animation: none; }
-  .swipe-hint::after { animation: none; }
 }

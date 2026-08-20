@@ -7,6 +7,7 @@ import { MonthFilter } from "@/components/ui/MonthFilter";
 import { TypeIcon } from "@/components/ui/TypeIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
+import { ArrowUpRight } from "@/components/mascot/Mascots";
 import { formatDateTime, formatMonth } from "@/lib/date";
 import type { Feed } from "@/lib/velite";
 
@@ -151,7 +152,7 @@ export function FeedClient({ feeds }: FeedClientProps) {
                     )}
                     {item.link && (
                       <span className="mt-3 inline-flex items-center gap-1 text-[10px] font-mono text-cp/70 group-hover:text-cp transition-colors">
-                        查看来源{"\u2197"}
+                        查看来源 <ArrowUpRight className="w-4 h-4" />
                       </span>
                     )}
                   </BentoTile>

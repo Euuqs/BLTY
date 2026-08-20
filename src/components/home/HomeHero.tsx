@@ -3,9 +3,10 @@
 import Image from "next/image";
 import { motion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
-import { DogMascot, PigMascot, Paw, Sparkle, Rose } from "@/components/mascot/Mascots";
+import { DogMascot, PigMascot, Paw, Sparkle, Rose, Heart } from "@/components/mascot/Mascots";
 import { CategoryBar } from "@/components/ui/CategoryBar";
 import { useCountUp } from "@/components/ui/useCountUp";
+import { formatMonthDay } from "@/lib/date";
 
 const container = {
   hidden: {},
@@ -22,6 +23,7 @@ interface HomeHeroProps {
   feedCount: number;
   categories: { label: string; count: number }[];
   categoryTotal: number;
+  latestDate: string;
 }
 
 function AnimatedNumber({ value, className }: { value: number; className?: string }) {
@@ -39,7 +41,7 @@ function AnimatedNumber({ value, className }: { value: number; className?: strin
   );
 }
 
-export function HomeHero({ styleCount, scheduleCount, feedCount, categories, categoryTotal }: HomeHeroProps) {
+export function HomeHero({ styleCount, scheduleCount, feedCount, categories, categoryTotal, latestDate }: HomeHeroProps) {
   return (
     <motion.section
       variants={container}
@@ -62,13 +64,18 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-background/20 z-[1]" />
 
-        {/* 水印字样 */}
-        <span
-          className="absolute bottom-16 sm:bottom-20 -right-2 sm:-right-4 md:right-6 font-serif text-[3.5rem] sm:text-[5rem] md:text-[8rem] leading-none text-white/[0.05] tracking-tight select-none z-[1] pointer-events-none"
+        {/* 水印字样 + 花体英文点缀 */}
+        <div
+          className="absolute bottom-16 sm:bottom-20 -right-2 sm:-right-4 md:right-6 text-right leading-none select-none z-[1] pointer-events-none"
           aria-hidden="true"
         >
-          柏里挑怡
-        </span>
+          <span className="block font-serif text-[3.5rem] sm:text-[5rem] md:text-[8rem] text-white/[0.05] tracking-tight">
+            柏里挑怡
+          </span>
+          <span className="block font-script text-2xl sm:text-3xl md:text-4xl text-white/[0.10] -mt-1 sm:-mt-2 mr-1 sm:mr-3">
+            Baili Tiaoyi
+          </span>
+        </div>
 
         {/* 星尘与爪印点缀 */}
         <Sparkle className="twinkle absolute top-6 right-8 w-6 h-6 text-white/70 z-[2] hidden sm:block" />
@@ -126,13 +133,13 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
             whileHover={{ scale: 1.05, y: -2 }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-white/90 text-xs font-mono border border-white/20 backdrop-blur-sm cursor-default"
           >
-            {"\u2605"} 柏欣妤 {"\u00B7"} 白
+            <Sparkle className="w-3.5 h-3.5" /> 柏欣妤 {"\u00B7"} 白
           </motion.span>
           <motion.span
             whileHover={{ scale: 1.05, y: -2 }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-zhu/30 text-white text-xs font-mono border border-zhu/40 backdrop-blur-sm cursor-default"
           >
-            {"\u2661"} 朱怡欣 {"\u00B7"} 蓝
+            <Heart className="w-3.5 h-3.5" /> 朱怡欣 {"\u00B7"} 蓝
           </motion.span>
         </div>
       </motion.div>
@@ -156,7 +163,7 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
                   transition={{ duration: 2, repeat: Infinity }}
                   className="text-cp text-[10px] absolute left-1/2 -top-2 -translate-x-1/2"
                 >
-                  {"\u2665"}
+                  <Heart className="w-3.5 h-3.5 text-cp" />
                 </motion.span>
               </div>
               <motion.div whileHover={{ scale: 1.2, rotate: 10 }}>
@@ -182,6 +189,12 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
                 <AnimatedNumber value={feedCount} className="block font-serif text-2xl font-semibold text-cp group-hover:scale-110 transition-transform duration-300" />
                 <p className="text-[10px] text-muted font-mono mt-1">动态</p>
               </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-rose animate-pulse" />
+              <span className="font-mono text-[10px] text-muted tracking-wider" title={latestDate || undefined}>
+                最近更新 · {latestDate ? formatMonthDay(latestDate) : "暂无"}
+              </span>
             </div>
             <CategoryBar items={categories} total={categoryTotal} />
           </BentoTile>

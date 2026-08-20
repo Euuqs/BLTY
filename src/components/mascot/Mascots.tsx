@@ -107,6 +107,52 @@ export function Sparkle({ className = "" }: { className?: string }) {
   );
 }
 
+export function Envelope({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="5.5" width="18" height="13" rx="2.5" />
+        <path d="M3.5 7.5 L12 13.5 L20.5 7.5" />
+      </g>
+    </svg>
+  );
+}
+
+export function Heart({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <path
+        d="M12 20 C6.5 15.5 3 12.5 3 8.8 C3 6 5.2 4 7.8 4 C9.6 4 11 5 12 6.4 C13 5 14.4 4 16.2 4 C18.8 4 21 6 21 8.8 C21 12.5 17.5 15.5 12 20 Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function ArrowUpRight({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 17 L17 7" />
+        <path d="M9 7 L17 7 L17 15" />
+      </g>
+    </svg>
+  );
+}
+
+export function ArrowRight({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true">
+      <g stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 12 L20 12" />
+        <path d="M14 6 L20 12 L14 18" />
+      </g>
+    </svg>
+  );
+}
+
 export function Rose({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { DogMascot, PigMascot, Paw, Rose } from "@/components/mascot/Mascots";
+import { DogMascot, PigMascot, Paw, Rose, Heart } from "@/components/mascot/Mascots";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 
 export function FooterMascots() {
@@ -53,7 +53,7 @@ export function FooterMascots() {
           transition={{ duration: 2, repeat: Infinity }}
           className="text-cp/50 text-base tracking-widest"
         >
-          {"\u2665"}
+          <Heart className="w-4 h-4 text-cp/50" />
         </motion.span>
         <motion.div
           whileHover={{ scale: 1.15, rotate: 10 }}

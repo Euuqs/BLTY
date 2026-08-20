@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { BentoTile } from "@/components/bento/BentoTile";
-import { DogMascot, PigMascot, Paw, Rose } from "@/components/mascot/Mascots";
+import { DogMascot, PigMascot, Paw, Rose, Heart, ArrowUpRight, ArrowRight } from "@/components/mascot/Mascots";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BirthdayCountdown } from "@/components/ui/BirthdayCountdown";
 import { Reveal } from "@/components/ui/Reveal";
+import { TourHighlight } from "@/components/tour/TourHighlight";
+import { TourNotice } from "@/components/tour/TourNotice";
 import { StatsCharts } from "@/components/bento/StatsCharts";
 import { TagCloud } from "@/components/bento/TagCloud";
 import { sameStyles, schedules, feeds } from "@/lib/velite";
@@ -28,6 +30,13 @@ export default function Home() {
   }));
   const categoryTotal = categories.reduce((a, c) => a + c.count, 0);
 
+  // 最新内容日期（动态优先，回退到同款、行程；客户端组件内换算成“几天前”）
+  const latestDate =
+    feeds.map((f) => f.date).sort().at(-1) ??
+    sameStyles.map((s) => s.date).sort().at(-1) ??
+    schedules.map((s) => s.date).sort().at(-1) ??
+    "";
+
   const socialLinks: Record<
     string,
     { platform: string; label: string; url: string }[]
@@ -45,18 +54,26 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8 lg:gap-10">
+      <TourNotice />
+
       <HomeHero
         styleCount={sameStyles.length}
         scheduleCount={schedules.length}
         feedCount={feeds.length}
         categories={categories}
         categoryTotal={categoryTotal}
+        latestDate={latestDate}
       />
 
       {/* ===== 生日倒计时 ===== */}
       <Reveal>
         <BirthdayCountdown />
+      </Reveal>
+
+      {/* ===== 巡演宣传 ===== */}
+      <Reveal delay={0.05}>
+        <TourHighlight />
       </Reveal>
 
       {/* ===== 数据洞察 + 标签云 ===== */}
@@ -83,7 +100,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
             <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 h-14 w-14 items-center justify-center rounded-full bg-surface-2 border border-cp/50 shadow-[0_0_28px_oklch(0.65_0.22_295/0.45)]">
-              <span className="text-cp text-xl">{"\u2665"}</span>
+              <Heart className="w-6 h-6 text-cp" />
             </div>
 
             <BentoTile className="overflow-hidden group">
@@ -166,7 +183,7 @@ export default function Home() {
                     ) : (
                       <PigMascot className="w-5 h-5 opacity-80" />
                     )}
-                    <span className={"text-sm " + arrowColor}>{"\u2197"}</span>
+                    <ArrowUpRight className={"w-4 h-4 " + arrowColor} />
                   </div>
                 </div>
                 <div className="flex flex-col gap-2.5">
@@ -189,9 +206,7 @@ export default function Home() {
                       >
                         {s.label}
                       </span>
-                      <span className={"text-sm shrink-0 " + linkHover + " " + arrowColor}>
-                        {"\u2197"}
-                      </span>
+                      <ArrowUpRight className={"w-4 h-4 shrink-0 " + linkHover + " " + arrowColor} />
                     </a>
                   ))}
                 </div>
@@ -208,7 +223,7 @@ export default function Home() {
             <Link href="/same-styles" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 02</span>
-                <span className="text-cp text-sm">{"\u2192"}</span>
+                <span className="text-cp text-sm"><ArrowRight className="w-4 h-4" /></span>
               </div>
               <h2 className="font-serif text-xl font-semibold mb-2">同款衣橱</h2>
               <p className="text-sm text-muted mb-4">衣服 {"\u00B7"} 饰品 {"\u00B7"} 零食 {"\u00B7"} 美妆</p>
@@ -224,7 +239,7 @@ export default function Home() {
             <Link href="/schedule" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 03</span>
-                <span className="text-cp text-sm">{"\u2192"}</span>
+                <span className="text-cp text-sm"><ArrowRight className="w-4 h-4" /></span>
               </div>
               <h2 className="font-serif text-xl font-semibold mb-2">行程日历</h2>
               <p className="text-sm text-muted mb-4">综艺 {"\u00B7"} 直播 {"\u00B7"} 演出 {"\u00B7"} 活动</p>
@@ -244,7 +259,7 @@ export default function Home() {
             <Link href="/feed" prefetch={false} className="h-full flex flex-col">
               <div className="flex items-center justify-between mb-3">
                 <span className="font-mono text-[10px] tracking-widest text-muted">{"\u00A7"} 04</span>
-                <span className="text-cp text-sm">{"\u2192"}</span>
+                <span className="text-cp text-sm"><ArrowRight className="w-4 h-4" /></span>
               </div>
               <h2 className="font-serif text-xl font-semibold mb-2">动态时间线</h2>
               <p className="text-sm text-muted mb-4">路透 {"\u00B7"} 日常 {"\u00B7"} 舞台</p>
@@ -258,6 +273,56 @@ export default function Home() {
               </div>
             </Link>
           </BentoTile>
+        </section>
+      </Reveal>
+
+      {/* ===== 加入应援 · 社区 CTA ===== */}
+      <Reveal delay={0.05}>
+        <section className="gradient-border relative overflow-hidden rounded-2xl border border-rose/30 bg-gradient-to-br from-rose/15 via-surface to-surface px-6 py-8 md:px-10 md:py-10">
+          <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-rose/10 blur-3xl pointer-events-none" />
+          <Rose className="absolute -bottom-5 -left-4 w-24 h-24 text-rose/10 rotate-[-20deg] pointer-events-none" />
+          <div className="relative flex flex-col md:flex-row md:items-center gap-6">
+            <div className="flex-1">
+              <p className="font-mono text-[10px] tracking-[0.35em] text-rose uppercase mb-2">
+                {"\u00A7"} 05 {"\u00B7"} Join
+              </p>
+              <h2 className="font-serif text-2xl md:text-3xl font-semibold">
+                入股柏里挑怡
+              </h2>
+              <p className="text-sm text-muted mt-2 max-w-xl leading-relaxed">
+                关注两位小偶像的微博超话与应援站，第一时间获取同款、行程与动态。
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              <a
+                href="https://weibo.com/u/3209726480"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-rose to-[oklch(0.58_0.22_350)] text-white text-sm font-medium btn-press shadow-[0_0_24px_oklch(0.52_0.24_15/0.35)]"
+              >
+                关注应援站
+                <ArrowUpRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+              <a
+                href="https://s.weibo.com/weibo?q=%23%E6%9F%8F%E6%AC%A3%E5%A6%A4%23"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-surface-2 border border-bai/25 text-sm text-bai hover:border-bai/50 transition-colors duration-200 btn-press"
+              >
+                <span className="w-1.5 h-1.5 rounded-full dot-bai" />
+                柏欣妤超话
+              </a>
+              <a
+                href="https://s.weibo.com/weibo?q=%23%E6%9C%B1%E6%80%A1%E6%AC%A3%23"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-surface-2 border border-zhu/30 text-sm text-zhu hover:border-zhu/60 transition-colors duration-200 btn-press"
+              >
+                <span className="w-1.5 h-1.5 rounded-full dot-zhu" />
+                朱怡欣超话
+              </a>
+            </div>
+          </div>
         </section>
       </Reveal>
     </div>

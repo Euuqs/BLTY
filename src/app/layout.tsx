@@ -3,6 +3,7 @@ import { MotionConfig } from "motion/react";
 import "@fontsource-variable/fraunces";
 import "@fontsource/manrope";
 import "@fontsource/jetbrains-mono";
+import "@fontsource/great-vibes";
 import "./globals.css";
 import { Navigation } from "@/components/layout/Navigation";
 import { ScrollProgress } from "@/components/ui/ScrollProgress";
@@ -70,7 +71,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light")}catch(e){}`,
+            __html: `try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f6f4fb":"#120d20"}catch(e){}`,
           }}
         />
       </head>

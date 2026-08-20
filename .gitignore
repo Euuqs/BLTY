@@ -44,3 +44,7 @@ debug.log
 next-env.d.ts
 
 .velite
+
+# tool directories
+.omo/
+.opencode/

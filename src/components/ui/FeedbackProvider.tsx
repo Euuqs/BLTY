@@ -1,12 +1,14 @@
 "use client";
 
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { Heart, Sparkle } from "@/components/mascot/Mascots";
 
 interface Particle {
   id: number;
   x: number;
   y: number;
-  emoji: string;
+  kind: "heart" | "sparkle";
+  color: string;
 }
 
 interface ConfettiPiece {
@@ -26,8 +28,8 @@ interface FeedbackContextType {
 
 const FeedbackContext = createContext<FeedbackContextType | null>(null);
 
-const HEART_EMOJIS = ["\u2665", "\u2764", "\u{1F49C}", "\u{1F499}", "\u{1F496}"];
-const SPARKLE_EMOJIS = ["\u2728", "\u2B50", "\u{1F31F}", "\u2727"];
+const HEART_COLORS = ["text-rose", "text-cp", "text-zhu", "text-bai"];
+const SPARKLE_COLORS = ["text-white", "text-rose", "text-cp"];
 const CONFETTI_COLORS = [
   "oklch(0.65 0.22 295)",
   "oklch(0.60 0.18 250)",
@@ -43,7 +45,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
 
   const spawnParticles = useCallback(
     (x: number, y: number, type: "hearts" | "sparkles" = "hearts", count = 6) => {
-      const emojis = type === "hearts" ? HEART_EMOJIS : SPARKLE_EMOJIS;
+      const colors = type === "hearts" ? HEART_COLORS : SPARKLE_COLORS;
       const newParticles: Particle[] = [];
 
       for (let i = 0; i < count; i++) {
@@ -53,7 +55,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
           id: particleIdRef.current++,
           x: x + Math.cos(angle) * distance * 0.3,
           y: y + Math.sin(angle) * distance * 0.3 - 20,
-          emoji: emojis[Math.floor(Math.random() * emojis.length)],
+          kind: type === "hearts" ? "heart" : "sparkle",
+          color: colors[Math.floor(Math.random() * colors.length)],
         });
       }
 
@@ -91,6 +94,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     (event: React.MouseEvent<HTMLElement>, color?: string) => {
       const element = event.currentTarget;
       const rect = element.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(element);
       const ripple = document.createElement("span");
       const size = Math.max(rect.width, rect.height);
       const x = event.clientX - rect.left - size / 2;
@@ -102,13 +106,19 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       ripple.style.top = `${y}px`;
       if (color) ripple.style.background = color;
 
-      element.classList.add("ripple-container");
+      if (computedStyle.position === "static") {
+        element.classList.add("ripple-container");
+      }
+      element.style.overflow = "hidden";
       element.appendChild(ripple);
 
       setTimeout(() => {
         ripple.remove();
         if (!element.querySelector(".ripple")) {
-          element.classList.remove("ripple-container");
+          if (computedStyle.position === "static") {
+            element.classList.remove("ripple-container");
+          }
+          element.style.overflow = "";
         }
       }, 600);
     },
@@ -121,14 +131,18 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       {particles.map((p) => (
         <span
           key={p.id}
-          className="heart-particle"
+          className={p.kind === "heart" ? "heart-particle" : "sparkle-particle"}
           style={{
             left: p.x,
             top: p.y,
             transform: "translate(-50%, -50%)",
           }}
         >
-          {p.emoji}
+          {p.kind === "heart" ? (
+            <Heart className={"w-5 h-5 " + p.color} />
+          ) : (
+            <Sparkle className={"w-5 h-5 " + p.color} />
+          )}
         </span>
       ))}
       {confetti.map((piece) => (
