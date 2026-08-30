@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
-import { DogMascot, PigMascot, Paw, Sparkle, Rose, Heart } from "@/components/mascot/Mascots";
+import { DogMascot, PigMascot, Paw, Sparkle, Rose, Heart, ArrowUpRight } from "@/components/mascot/Mascots";
 import { CategoryBar } from "@/components/ui/CategoryBar";
 import { useCountUp } from "@/components/ui/useCountUp";
 import { formatMonthDay } from "@/lib/date";
@@ -27,16 +28,28 @@ interface HomeHeroProps {
 }
 
 function AnimatedNumber({ value, className }: { value: number; className?: string }) {
-  const { count, ref } = useCountUp(value, 1500);
+  const { count, ref } = useCountUp(value, 1800);
   return (
     <motion.span
       ref={ref}
       className={className}
-      initial={{ scale: 0.8, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 15 }}
+      initial={{ scale: 0.6, opacity: 0, filter: "blur(8px)" }}
+      animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+      transition={{ delay: 0.3, type: "spring", stiffness: 180, damping: 14 }}
     >
-      {count}
+      <motion.span
+        className="inline-block"
+        animate={{
+          textShadow: [
+            "0 0 0px transparent",
+            "0 0 18px var(--glow-color, var(--cp-glow))",
+            "0 0 0px transparent",
+          ],
+        }}
+        transition={{ duration: 1.8, ease: "easeOut" }}
+      >
+        {count}
+      </motion.span>
     </motion.span>
   );
 }
@@ -52,24 +65,34 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
       {/* ===== 主 Hero ===== */}
       <motion.div
         variants={item}
-        className="col-span-12 lg:col-span-8 min-h-[340px] sm:min-h-[440px] bento-tile flex flex-col justify-between relative overflow-hidden group"
+        className="order-2 md:order-2 md:col-start-5 col-span-12 md:col-span-8 min-h-[360px] sm:min-h-[460px] bento-tile flex flex-col justify-between relative overflow-hidden group"
       >
         <Image
           src="/hero-wedding.jpg"
-          alt="柏里挑怡"
+          alt="柏里挑怡 婚纱合影"
           fill
           sizes="(max-width: 1024px) 100vw, 66vw"
-          className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+          className="object-cover object-[52%_42%] sm:object-[52%_44%] transition-transform duration-700 group-hover:scale-105"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-background/20 z-[1]" />
+        <div className="hero-halo" />
+        <div className="home-hero-overlay absolute inset-0 bg-gradient-to-t from-background/80 via-background/30 to-background/10 z-[1]" />
+        <div
+          className="absolute inset-0 z-[2] pointer-events-none opacity-25"
+          style={{
+            backgroundImage:
+              "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")",
+            backgroundSize: "180px 180px",
+            mixBlendMode: "overlay",
+          }}
+        />
 
         {/* 水印字样 + 花体英文点缀 */}
         <div
-          className="absolute bottom-16 sm:bottom-20 -right-2 sm:-right-4 md:right-6 text-right leading-none select-none z-[1] pointer-events-none"
+          className="absolute bottom-16 sm:bottom-20 -right-2 sm:-right-4 md:right-6 text-right leading-none select-none z-[1] pointer-events-none hidden sm:block"
           aria-hidden="true"
         >
-          <span className="block font-serif text-[3.5rem] sm:text-[5rem] md:text-[8rem] text-white/[0.05] tracking-tight">
+          <span className="block font-serif text-[3.5rem] sm:text-[5rem] md:text-[8rem] text-white/[0.04] tracking-tight">
             柏里挑怡
           </span>
           <span className="block font-script text-2xl sm:text-3xl md:text-4xl text-white/[0.10] -mt-1 sm:-mt-2 mr-1 sm:mr-3">
@@ -91,7 +114,7 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8, ease: [0.22, 1, 0.36, 1] as const }}
-          className="mascot-float absolute -bottom-4 -right-2 lg:right-4 w-36 md:w-44 lg:w-56 z-[2] hidden sm:block"
+          className="mascot-float absolute -bottom-4 -right-2 lg:right-4 w-36 md:w-40 lg:w-48 z-[2] hidden sm:block"
         >
           <div className="absolute inset-8 rounded-full bg-white/10 blur-2xl" />
           <DogMascot className="relative w-full h-full text-white" />
@@ -123,7 +146,6 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
         <div className="relative z-10 flex flex-wrap items-center gap-2 sm:gap-3 mt-8">
           <motion.span
             whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 text-white text-xs font-mono border border-white/30 backdrop-blur-sm cursor-default"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
@@ -144,11 +166,14 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
         </div>
       </motion.div>
 
-      <div className="col-span-12 lg:col-span-4 flex flex-col gap-4">
-        <motion.div variants={item} className="flex-1 flex">
-          <BentoTile className="flex-1 flex flex-col justify-center group">
+      <div className="order-1 md:order-1 md:col-start-1 md:row-start-1 col-span-12 md:col-span-4 contents md:flex md:flex-col md:gap-4">
+        <motion.div variants={item} className="order-1 md:order-none col-span-12 md:col-span-4 flex-1 flex">
+          <BentoTile className="flex-1 flex flex-col justify-center group surface-2">
             <p className="font-mono text-[10px] tracking-widest text-muted mb-3 uppercase">Motto</p>
-            <p className="font-serif text-xl md:text-2xl leading-relaxed text-gradient-cp font-medium">
+            <h1 className="font-serif text-4xl sm:text-5xl font-extrabold leading-[1.02] tracking-tight text-foreground text-balance">
+              柏里挑怡
+            </h1>
+            <p className="font-serif text-xl md:text-2xl leading-relaxed text-gradient-cp font-bold tracking-tight">
               心动穿越千里，
               <br />
               所爱柏里挑怡。
@@ -170,22 +195,30 @@ export function HomeHero({ styleCount, scheduleCount, feedCount, categories, cat
                 <PigMascot className="w-9 h-9 shrink-0 opacity-90" />
               </motion.div>
             </div>
+            <Link
+              href="/tour"
+              prefetch={false}
+              className="group/cta mt-5 inline-flex w-fit items-center gap-2 rounded-xl bg-cp px-4 py-2.5 text-sm font-medium text-background transition-colors hover:bg-cp/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cp focus-visible:ring-offset-2 focus-visible:ring-offset-surface-2"
+            >
+              查看巡演攻略
+              <ArrowUpRight className="h-4 w-4 transition-transform duration-200 group-hover/cta:-translate-y-0.5 group-hover/cta:translate-x-0.5" />
+            </Link>
           </BentoTile>
         </motion.div>
 
-        <motion.div variants={item} className="flex-1 flex">
+        <motion.div variants={item} className="order-3 md:order-none col-span-12 md:col-span-4 flex-1 flex">
           <BentoTile className="flex-1">
             <p className="font-mono text-[10px] tracking-widest text-muted mb-3 uppercase">Count</p>
             <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="group cursor-default">
+              <div className="group cursor-default" style={{ ['--glow-color' as string]: 'var(--bai-glow)' }}>
                 <AnimatedNumber value={styleCount} className="block font-serif text-2xl font-semibold text-bai group-hover:scale-110 transition-transform duration-300" />
                 <p className="text-[10px] text-muted font-mono mt-1">同款</p>
               </div>
-              <div className="group cursor-default">
+              <div className="group cursor-default" style={{ ['--glow-color' as string]: 'var(--zhu-glow)' }}>
                 <AnimatedNumber value={scheduleCount} className="block font-serif text-2xl font-semibold text-zhu group-hover:scale-110 transition-transform duration-300" />
                 <p className="text-[10px] text-muted font-mono mt-1">行程</p>
               </div>
-              <div className="group cursor-default">
+              <div className="group cursor-default" style={{ ['--glow-color' as string]: 'var(--cp-glow)' }}>
                 <AnimatedNumber value={feedCount} className="block font-serif text-2xl font-semibold text-cp group-hover:scale-110 transition-transform duration-300" />
                 <p className="text-[10px] text-muted font-mono mt-1">动态</p>
               </div>

@@ -48,14 +48,15 @@ function FilterButton({
   const { createRipple } = useFeedback();
 
   const activeStyles = {
-    default: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]",
-    bai: "bg-bai text-background border-bai shadow-[0_0_12px_oklch(0.92_0.01_260/0.4)]",
-    zhu: "bg-zhu text-background border-zhu shadow-[0_0_12px_oklch(0.55_0.20_250/0.4)]",
-    cp: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]",
+    default: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]",
+    bai: "bg-bai text-background border-bai shadow-[0_0_0_1px_oklch(0.92_0.01_260/0.25)]",
+    zhu: "bg-zhu text-background border-zhu shadow-[0_0_0_1px_oklch(0.55_0.20_250/0.25)]",
+    cp: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]",
   };
 
   return (
     <motion.button
+      type="button"
       whileHover={{ scale: 1.05, y: -1 }}
       whileTap={{ scale: 0.95 }}
       onClick={(e) => {
@@ -63,11 +64,12 @@ function FilterButton({
         onClick();
       }}
       className={
-        "relative overflow-hidden px-3 sm:px-3.5 py-2 sm:py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container " +
+        "relative overflow-hidden shrink-0 px-3 sm:px-3.5 py-2 sm:py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container " +
         (active
           ? activeStyles[variant]
           : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground")
       }
+      aria-pressed={active}
     >
       {children}
     </motion.button>
@@ -107,7 +109,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8">
+    <div className="gallery-page flex flex-col gap-6 sm:gap-8">
       <header className="flex flex-col gap-4">
         <div className="flex items-center gap-3">
           <span className="font-mono text-[10px] tracking-[0.35em] text-cp uppercase">
@@ -121,7 +123,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
             <PigMascot className="w-5 h-5 opacity-70" />
           </motion.div>
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
+        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
           <em className="text-gradient-cp not-italic">同款</em>衣橱
         </h1>
         <p className="text-muted text-sm max-w-xl">
@@ -130,7 +132,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
       </header>
 
       <div className="flex flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div role="group" aria-label="按品类与排序筛选" className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
           {categories.map((cat) => (
             <FilterButton
               key={cat}
@@ -151,7 +153,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
             </FilterButton>
           ))}
         </div>
-        <div className="flex flex-wrap gap-1.5">
+        <div role="group" aria-label="按成员筛选" className="flex flex-nowrap sm:flex-wrap gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
           {members.map((m) => {
             const isActive = activeMember === m;
             const dotClass = m === "柏欣妤" ? "dot-bai" : m === "朱怡欣" ? "dot-zhu" : m === "双人" ? "dot-cp" : "";
@@ -174,10 +176,10 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
 
       <motion.div
         layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
+        className="style-gallery grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
       >
         <AnimatePresence mode="popLayout">
-          {sorted.map((item) => {
+          {sorted.map((item, index) => {
             const coverClass = "style-cover cover-" + item.category + " style-cover-shine mb-0 rounded-none";
             return (
               <motion.div
@@ -212,6 +214,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
                           alt={item.title}
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                          loading={index === 0 ? "eager" : "lazy"}
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent z-[1]" />

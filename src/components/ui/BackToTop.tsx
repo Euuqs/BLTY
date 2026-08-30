@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useFeedback } from "./FeedbackProvider";
+import { DogMascot, Heart, Paw } from "@/components/mascot/Mascots";
 
 export function BackToTop() {
   const [show, setShow] = useState(false);
@@ -26,20 +27,24 @@ export function BackToTop() {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     createRipple(e as unknown as React.MouseEvent<HTMLElement>);
     
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    document.documentElement.scrollTo({ top: 0, behavior: "smooth" });
-    document.body.scrollTo({ top: 0, behavior: "smooth" });
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    window.scrollTo({ top: 0, behavior });
+    document.documentElement.scrollTo({ top: 0, behavior });
+    document.body.scrollTo({ top: 0, behavior });
 
-    setTimeout(() => {
-      spawnParticles(window.innerWidth / 2, window.innerHeight - 100, "hearts", 8);
-    }, 500);
+    if (behavior === "smooth") {
+      setTimeout(() => {
+        spawnParticles(window.innerWidth / 2, window.innerHeight - 100, "hearts", 8);
+      }, 500);
+    }
   };
 
   const moods = {
-    idle: { emoji: "\u{1F43E}", label: "回到顶部" },
-    happy: { emoji: "\u{1F60A}", label: "你滑了好多！" },
-    love: { emoji: "\u{1F495}", label: "真爱粉！" },
+    idle: { Icon: Paw, label: "回到顶部" },
+    happy: { Icon: DogMascot, label: "你滑了好多！" },
+    love: { Icon: Heart, label: "真爱粉！" },
   };
+  const MoodIcon = moods[mood].Icon;
 
   return (
     <AnimatePresence>
@@ -58,8 +63,9 @@ export function BackToTop() {
               <motion.span
                 animate={mood === "love" ? { scale: [1, 1.2, 1] } : {}}
                 transition={{ repeat: mood === "love" ? Infinity : 0, duration: 1 }}
+                className="flex items-center justify-center"
               >
-                {moods[mood].emoji}
+                <MoodIcon className="w-6 h-6 text-background" />
               </motion.span>
             </div>
             <span className="absolute right-full mr-2 top-1/2 -translate-y-1/2 -translate-x-2.5 group-hover:translate-x-0 transition-transform duration-200 whitespace-nowrap px-2 py-1 rounded-lg bg-surface/90 backdrop-blur text-[10px] font-mono text-foreground border border-border opacity-0 group-hover:opacity-100 pointer-events-none">

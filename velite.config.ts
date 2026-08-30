@@ -36,6 +36,11 @@ export default defineConfig({
       pattern: "same-styles/**/*.mdx",
       schema: s
         .object({
+          id: s.string().optional(),
+          slug: s.string().optional(),
+          status: s.enum(["draft", "published"]).optional(),
+          updatedAt: s.string().datetime({ offset: true }).optional(),
+          publishedAt: s.string().datetime({ offset: true }).optional(),
           title: s.string().max(99),
           date: s.isodate(),
           category: s.enum(["衣服", "饰品", "零食", "美妆", "鞋包", "其他"]),
@@ -50,7 +55,8 @@ export default defineConfig({
           const { body, ...rest } = data;
           return {
             ...rest,
-            slug: slugify(data.title, data.date),
+            status: data.status ?? "published",
+            slug: data.slug ?? slugify(data.title, data.date),
             html: mdxToHtml(body),
           };
         }),
@@ -60,9 +66,15 @@ export default defineConfig({
       pattern: "schedules/**/*.mdx",
       schema: s
         .object({
+          id: s.string().optional(),
+          slug: s.string().optional(),
+          status: s.enum(["draft", "published"]).optional(),
+          updatedAt: s.string().datetime({ offset: true }).optional(),
+          publishedAt: s.string().datetime({ offset: true }).optional(),
           title: s.string().max(99),
           date: s.isodate(),
           time: s.string().optional(),
+          timeMode: s.enum(["specific", "all-day", "tbd"]).optional(),
           member: s.enum(["A", "B", "both"]),
           type: s.enum(["综艺", "直播", "演出", "活动", "其他"]).optional(),
           location: s.string().optional(),
@@ -71,7 +83,9 @@ export default defineConfig({
         })
         .transform((data) => ({
           ...data,
-          slug: slugify(data.title, data.date),
+          status: data.status ?? "published",
+          slug: data.slug ?? slugify(data.title, data.date),
+          timeMode: data.timeMode ?? (data.time ? "specific" : "tbd"),
         })),
     },
     feeds: {
@@ -79,6 +93,11 @@ export default defineConfig({
       pattern: "feeds/**/*.mdx",
       schema: s
         .object({
+          id: s.string().optional(),
+          slug: s.string().optional(),
+          status: s.enum(["draft", "published"]).optional(),
+          updatedAt: s.string().datetime({ offset: true }).optional(),
+          publishedAt: s.string().datetime({ offset: true }).optional(),
           title: s.string().max(99),
           date: s.isodate(),
           member: s.enum(["A", "B", "both"]),
@@ -88,7 +107,11 @@ export default defineConfig({
           tags: s.array(s.string()).optional(),
           body: s.mdx(),
         })
-        .transform((data) => ({ ...data, slug: slugify(data.title, data.date) })),
+        .transform((data) => ({
+          ...data,
+          status: data.status ?? "published",
+          slug: data.slug ?? slugify(data.title, data.date),
+        })),
     },
   },
   markdown: {

@@ -69,9 +69,12 @@ export function TourNotice() {
                 </span>
                 <span className="font-mono text-[10px] text-muted">08.22 杭州站</span>
               </div>
-              <p className="text-sm font-medium mt-0.5 truncate">
-                PRIVATE SIGNAL 巡演攻略已上线
-                <span className="hidden sm:inline text-muted font-normal ml-2">痛楼 · 大屏 · 场外应援全汇总</span>
+              <p className="text-sm font-medium mt-0.5" title="PRIVATE SIGNAL 巡演攻略已上线 · 痛楼 · 大屏 · 场外应援全汇总">
+                <span className="sm:hidden">攻略已上线</span>
+                <span className="hidden sm:inline">
+                  PRIVATE SIGNAL 巡演攻略已上线
+                  <span className="text-muted font-normal ml-2">痛楼 · 大屏 · 场外应援全汇总</span>
+                </span>
               </p>
             </div>
 

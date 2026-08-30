@@ -1,14 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 import { BentoTile } from "@/components/bento/BentoTile";
 import { DogMascot, PigMascot, Paw, Rose, Heart, ArrowUpRight, ArrowRight } from "@/components/mascot/Mascots";
 import { HomeHero } from "@/components/home/HomeHero";
 import { BirthdayCountdown } from "@/components/ui/BirthdayCountdown";
 import { Reveal } from "@/components/ui/Reveal";
 import { TourHighlight } from "@/components/tour/TourHighlight";
-import { TourNotice } from "@/components/tour/TourNotice";
 import { StatsCharts } from "@/components/bento/StatsCharts";
 import { TagCloud } from "@/components/bento/TagCloud";
-import { sameStyles, schedules, feeds } from "@/lib/velite";
+import { SectionIndicator } from "@/components/ui/SectionIndicator";
+import {
+  publishedFeeds as feeds,
+  publishedSameStyles as sameStyles,
+  publishedSchedules as schedules,
+} from "@/lib/velite";
 import { formatMonthDay } from "@/lib/date";
 
 export default function Home() {
@@ -53,40 +58,59 @@ export default function Home() {
     ],
   };
 
+  const navSections = [
+    { id: "hero", label: "首页" },
+    { id: "countdown", label: "生日" },
+    { id: "tour", label: "巡演" },
+    { id: "insights", label: "数据" },
+    { id: "profile", label: "档案" },
+    { id: "social", label: "社交" },
+    { id: "guide", label: "导流" },
+    { id: "join", label: "应援" },
+  ];
+
   return (
     <div className="flex flex-col gap-8 lg:gap-10">
-      <TourNotice />
-
-      <HomeHero
-        styleCount={sameStyles.length}
-        scheduleCount={schedules.length}
-        feedCount={feeds.length}
-        categories={categories}
-        categoryTotal={categoryTotal}
-        latestDate={latestDate}
-      />
+      <SectionIndicator sections={navSections} />
+      <div id="hero" className="scroll-target">
+        <HomeHero
+          styleCount={sameStyles.length}
+          scheduleCount={schedules.length}
+          feedCount={feeds.length}
+          categories={categories}
+          categoryTotal={categoryTotal}
+          latestDate={latestDate}
+        />
+      </div>
 
       {/* ===== 生日倒计时 ===== */}
-      <Reveal>
-        <BirthdayCountdown />
-      </Reveal>
+      <div id="countdown" className="scroll-target">
+        <Reveal>
+          <BirthdayCountdown />
+        </Reveal>
+      </div>
 
       {/* ===== 巡演宣传 ===== */}
-      <Reveal delay={0.05}>
-        <TourHighlight />
-      </Reveal>
+      <div id="tour" className="scroll-target">
+        <Reveal delay={0.05}>
+          <TourHighlight />
+        </Reveal>
+      </div>
 
       {/* ===== 数据洞察 + 标签云 ===== */}
-      <Reveal delay={0.05}>
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <StatsCharts />
-          <TagCloud />
-        </section>
-      </Reveal>
+      <div id="insights" className="scroll-target">
+        <Reveal delay={0.05}>
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <StatsCharts />
+            <TagCloud />
+          </section>
+        </Reveal>
+      </div>
 
       {/* ===== 成员档案 · 萌宠标志 ===== */}
-      <Reveal delay={0.05}>
-        <section>
+      <div id="profile" className="scroll-target">
+        <Reveal delay={0.05}>
+          <section>
           <div className="flex items-center gap-3 mb-4">
             <span className="font-mono text-[10px] tracking-[0.35em] text-cp uppercase">
               {"\u00A7"} 01 {"\u00B7"} Profile
@@ -115,10 +139,18 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center py-2">
                 <div className="relative w-32 h-32 md:w-36 md:h-36 transition-transform duration-500 group-hover:scale-105">
-                  <div className="absolute inset-4 rounded-full bg-bai/10 blur-xl" />
-                  <DogMascot className="relative w-full h-full text-bai" />
+                  <div className="absolute inset-0 rounded-full bg-bai/20 blur-xl scale-110" />
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-bai/30 shadow-[0_0_24px_oklch(0.85_0.07_260/0.3)]">
+                    <Image
+                      src="/static/mascots/bai-profile.jpg"
+                      alt="柏欣妤"
+                      fill
+                      sizes="(max-width: 768px) 128px, 144px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  </div>
                 </div>
-                <h2 className="font-serif text-2xl md:text-3xl font-semibold mt-3">柏欣妤</h2>
+                <h2 className="font-serif text-2xl md:text-3xl font-extrabold tracking-tight mt-3">柏欣妤</h2>
                 <p className="font-mono text-[10px] text-muted tracking-[0.3em] uppercase mt-1">Bai Xinyu</p>
                 <p className="text-sm text-muted mt-2 text-center">
                   「全世界<span className="text-zhu">朱怡欣</span>最喜欢我！」
@@ -141,10 +173,18 @@ export default function Home() {
               </div>
               <div className="flex flex-col items-center py-2">
                 <div className="relative w-32 h-32 md:w-36 md:h-36 transition-transform duration-500 group-hover:scale-105">
-                  <div className="absolute inset-4 rounded-full bg-zhu/10 blur-xl" />
-                  <PigMascot className="relative w-full h-full text-zhu" />
+                  <div className="absolute inset-0 rounded-full bg-zhu/20 blur-xl scale-110" />
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-zhu/40 shadow-[0_0_24px_oklch(0.6_0.18_250/0.35)]">
+                    <Image
+                      src="/static/mascots/zhu-profile.jpg"
+                      alt="朱怡欣"
+                      fill
+                      sizes="(max-width: 768px) 128px, 144px"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                  </div>
                 </div>
-                <h2 className="font-serif text-2xl md:text-3xl font-semibold mt-3">朱怡欣</h2>
+                <h2 className="font-serif text-2xl md:text-3xl font-extrabold tracking-tight mt-3">朱怡欣</h2>
                 <p className="font-mono text-[10px] text-muted tracking-[0.35em] uppercase mt-1">Zhu Yixin</p>
                 <p className="text-sm text-muted mt-2 text-center">
                   「全世界我最喜欢<span className="text-bai">柏欣妤</span>了！」
@@ -158,8 +198,10 @@ export default function Home() {
           </div>
         </section>
       </Reveal>
+      </div>
 
       {/* ===== 社交账号 ===== */}
+      <div id="social" className="scroll-target">
       <Reveal delay={0.05}>
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {(["bai", "zhu"] as const).map((member) => {
@@ -215,8 +257,10 @@ export default function Home() {
           })}
         </section>
       </Reveal>
+      </div>
 
       {/* ===== 首页导流 ===== */}
+      <div id="guide" className="scroll-target">
       <Reveal delay={0.05}>
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <BentoTile className="col-span-1" interactive>
@@ -275,8 +319,10 @@ export default function Home() {
           </BentoTile>
         </section>
       </Reveal>
+      </div>
 
       {/* ===== 加入应援 · 社区 CTA ===== */}
+      <div id="join" className="scroll-target">
       <Reveal delay={0.05}>
         <section className="gradient-border relative overflow-hidden rounded-2xl border border-rose/30 bg-gradient-to-br from-rose/15 via-surface to-surface px-6 py-8 md:px-10 md:py-10">
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-rose/10 blur-3xl pointer-events-none" />
@@ -325,6 +371,7 @@ export default function Home() {
           </div>
         </section>
       </Reveal>
+      </div>
     </div>
   );
 }

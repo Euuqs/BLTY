@@ -13,9 +13,10 @@
   --foreground: oklch(0.97 0.005 285);
 
   /* Bento 卡片表面 */
-  --surface: oklch(0.18 0.03 285);
-  --surface-2: oklch(0.22 0.035 285);
-  --surface-3: oklch(0.27 0.04 285);
+  --surface: oklch(0.20 0.03 285);
+  --surface-2: oklch(0.24 0.035 285);
+  --surface-3: oklch(0.29 0.04 285);
+  --surface-border: oklch(0.31 0.04 285);
 
   /* 三色体系 */
   --bai: oklch(0.95 0.005 260);       /* 柏欣妤 · 白色 */
@@ -30,6 +31,10 @@
   --rose: oklch(0.58 0.22 20);
   --rose-glow: oklch(0.52 0.24 15);
 
+  /* 分类辅助色 */
+  --amber: oklch(0.70 0.16 75);       /* 零食 · 琥珀 */
+  --amber-glow: oklch(0.65 0.18 70);
+
   /* 文字层级 */
   --muted: oklch(0.68 0.02 285);
   --border: oklch(0.28 0.04 285);
@@ -40,6 +45,11 @@
   --font-sans: "Manrope", "Noto Sans SC", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-script: "Great Vibes", cursive;
+
+  --motion-fast: 180ms;
+  --motion-base: 300ms;
+  --motion-slow: 500ms;
+  --motion-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @theme inline {
@@ -48,6 +58,7 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-border: var(--surface-border);
   --color-bai: var(--bai);
   --color-zhu: var(--zhu);
   --color-cp: var(--cp);
@@ -56,11 +67,17 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-rose: var(--rose);
+  --color-amber: var(--amber);
 
   --font-serif: var(--font-serif);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-script: var(--font-script);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -108,7 +125,7 @@ img, video, svg {
     radial-gradient(ellipse 80% 60% at 85% 25%, oklch(0.95 0.01 260 / 0.08), transparent 60%),
     radial-gradient(ellipse 70% 80% at 50% 90%, oklch(0.65 0.22 295 / 0.15), transparent 70%),
     radial-gradient(ellipse 50% 40% at 30% 60%, oklch(0.55 0.20 250 / 0.10), transparent 60%);
-  animation: cp-mesh-drift 25s ease-in-out infinite alternate;
+  animation: none;
 }
 
 @keyframes cp-mesh-drift {
@@ -134,19 +151,65 @@ img, video, svg {
 }
 
 /* ============================================
+   颗粒噪点层 · Hero 电影感
+   ============================================ */
+.cp-noise {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  animation: cp-noise-shift 3.2s steps(6) infinite;
+}
+
+@keyframes cp-noise-shift {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-2%, -1%); }
+  40%  { transform: translate(1%, 2%); }
+  60%  { transform: translate(-1%, 1%); }
+  80%  { transform: translate(2%, -2%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* Hero 光晕呼吸漂移 */
+.hero-halo {
+  position: absolute;
+  inset: -20%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 30% 40%, oklch(0.95 0.01 260 / 0.15), transparent 65%),
+    radial-gradient(ellipse 50% 40% at 70% 60%, oklch(0.65 0.22 295 / 0.15), transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 80%, oklch(0.60 0.18 250 / 0.12), transparent 55%);
+  opacity: 0.82;
+  animation: none;
+}
+
+@keyframes cp-halo-breathe {
+  0%   { transform: translate3d(0, 0, 0) scale(1);     opacity: 0.7; }
+  33%  { transform: translate3d(1%, -2%, 0) scale(1.02); opacity: 0.9; }
+  66%  { transform: translate3d(-1%, 1%, 0) scale(0.98); opacity: 0.8; }
+  100% { transform: translate3d(2%, 0, 0) scale(1.04);  opacity: 1; }
+}
+
+/* ============================================
    Bento 卡片
    ============================================ */
 .bento-tile {
-  background: color-mix(in oklch, var(--surface), transparent 5%);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
   border-radius: 1.25rem;
   overflow: hidden;
-  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-              border-color 0.4s ease,
-              box-shadow 0.4s ease,
-              background 0.4s ease;
+  transition: transform var(--motion-slow) var(--motion-ease),
+              border-color var(--motion-slow) ease,
+              box-shadow var(--motion-slow) ease,
+              background var(--motion-slow) ease;
   position: relative;
   backdrop-filter: blur(8px);
+  transform-style: preserve-3d;
+  perspective: 800px;
 }
 
 .bento-tile::before {
@@ -162,20 +225,66 @@ img, video, svg {
   );
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity var(--motion-base) ease;
+}
+
+.bento-tile::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    oklch(0.65 0.22 295 / 0.4) 15%,
+    oklch(0.60 0.18 250 / 0.25) 30%,
+    transparent 45%,
+    transparent 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity var(--motion-slow) ease;
+  pointer-events: none;
+  z-index: 1;
+  animation: cp-border-shimmer 4s linear infinite;
+  animation-play-state: paused;
 }
 
 .bento-tile:hover {
-  transform: translateY(-3px) scale(1.01);
-  border-color: var(--cp);
+  transform: translateY(-4px) scale(1.015);
+  border-color: oklch(0.65 0.22 295 / 0.28);
   box-shadow:
-    0 0 0 1px oklch(0.65 0.22 295 / 0.25),
-    0 25px 70px -25px oklch(0.65 0.22 295 / 0.35),
-    0 0 40px -10px oklch(0.60 0.18 250 / 0.15);
+    0 0 0 1px oklch(0.65 0.22 295 / 0.18),
+    0 18px 48px -24px oklch(0.65 0.22 295 / 0.28),
+    0 0 24px -12px oklch(0.60 0.18 250 / 0.12),
+    inset 0 1px 0 oklch(0.95 0.01 260 / 0.06);
+}
+
+.bento-tile:focus-visible,
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--cp);
+  outline-offset: 3px;
 }
 
 .bento-tile:hover::before {
   opacity: 1;
+}
+
+.bento-tile:hover::after {
+  opacity: 1;
+  animation-play-state: running;
+}
+
+@keyframes cp-border-shimmer {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* ============================================
@@ -213,7 +322,7 @@ img, video, svg {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  animation: gradient-shift 8s ease-in-out infinite;
+  animation: none;
 }
 
 @keyframes gradient-shift {
@@ -251,6 +360,40 @@ img, video, svg {
   margin-bottom: 1rem;
 }
 
+/* 页面模式 token：图库更轻、日历更结构化、时间线更强调日期锚点 */
+.gallery-page .style-gallery .bento-tile {
+  border-radius: 1rem;
+  background: var(--surface-2);
+}
+
+.gallery-page .style-cover {
+  aspect-ratio: 4 / 5;
+}
+
+.schedule-page .schedule-entry {
+  background: var(--surface-2);
+  border-left: 2px solid color-mix(in oklch, var(--cp), transparent 55%);
+}
+
+.schedule-page .schedule-calendar {
+  background: var(--surface-2);
+}
+
+.feed-page .feed-timeline > .relative .bento-tile {
+  background: var(--surface-2);
+  border-radius: 1rem;
+}
+
+@media (max-width: 640px) {
+  .gallery-page .style-cover {
+    aspect-ratio: 5 / 6;
+  }
+
+  .schedule-page .schedule-entry {
+    border-left-width: 1px;
+  }
+}
+
 .style-cover-gradient {
   width: 100%;
   height: 100%;
@@ -267,13 +410,57 @@ img, video, svg {
   background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
 }
 
-/* 按品类区分封面渐变 */
+/* 按品类区分封面渐变 + SVG 暗纹 */
 .cover-衣服 { background: linear-gradient(135deg, oklch(0.40 0.10 290), oklch(0.55 0.18 280)); }
 .cover-饰品 { background: linear-gradient(135deg, oklch(0.55 0.15 300), oklch(0.70 0.12 260)); }
 .cover-零食 { background: linear-gradient(135deg, oklch(0.50 0.14 50), oklch(0.55 0.18 30)); }
 .cover-美妆 { background: linear-gradient(135deg, oklch(0.55 0.18 330), oklch(0.60 0.15 350)); }
 .cover-鞋包 { background: linear-gradient(135deg, oklch(0.35 0.08 250), oklch(0.50 0.15 270)); }
 .cover-其他 { background: linear-gradient(135deg, oklch(0.35 0.08 285), oklch(0.45 0.12 290)); }
+
+/* 品类暗纹叠加 — 提升封面图缺失时的品质感 */
+.cover-衣服::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.08' stroke-width='1'%3E%3Cpath d='M0 30h60M30 0v60'/%3E%3Cpath d='M0 15h60M0 45h60M15 0v60M45 0v60'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.cover-饰品::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='white' fill-opacity='0.12'%3E%3Ccircle cx='10' cy='10' r='1'/%3E%3Ccircle cx='30' cy='10' r='0.5'/%3E%3Ccircle cx='20' cy='20' r='1.2'/%3E%3Ccircle cx='10' cy='30' r='0.7'/%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.cover-零食::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='50' height='50' viewBox='0 0 50 50'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.1' stroke-width='1'%3E%3Cpath d='M0 25 Q12.5 5 25 25 T50 25'/%3E%3Cpath d='M0 25 Q12.5 45 25 25 T50 25'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.cover-美妆::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'%3E%3Cg fill='white' fill-opacity='0.1'%3E%3Ccircle cx='12' cy='12' r='6'/%3E%3Ccircle cx='36' cy='12' r='4'/%3E%3Ccircle cx='24' cy='30' r='8'/%3E%3Ccircle cx='8' cy='38' r='3'/%3E%3Ccircle cx='40' cy='38' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.cover-鞋包::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.08' stroke-width='1.5'%3E%3Cpath d='M0 44L44 0'/%3E%3Cpath d='M-5 25L25 -5M10 49L49 10'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
+.cover-其他::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='52' viewBox='0 0 52 52'%3E%3Cg fill='none' stroke='white' stroke-opacity='0.06' stroke-width='1'%3E%3Crect x='4' y='4' width='44' height='44' rx='2'/%3E%3Crect x='12' y='12' width='28' height='28' rx='1'/%3E%3Crect x='20' y='20' width='12' height='12' rx='0.5'/%3E%3C/g%3E%3C/svg%3E");
+  pointer-events: none;
+}
 
 /* 分类占比条状图配色 */
 .cover-bar-衣服 { background: oklch(0.65 0.22 295); }
@@ -283,7 +470,7 @@ img, video, svg {
 .cover-bar-鞋包 { background: oklch(0.95 0.01 260); }
 .cover-bar-其他 { background: oklch(0.68 0.02 285); }
 
-/* 同款封面 · hover 流光扫过 */
+/* 同款封面 · hover 流光扫过 + 3D 透视抬升 */
 .style-cover-shine::after {
   content: "";
   position: absolute;
@@ -291,16 +478,27 @@ img, video, svg {
   z-index: 2;
   background: linear-gradient(
     105deg,
-    transparent 40%,
-    oklch(0.97 0.005 285 / 0.35) 50%,
-    transparent 60%
+    transparent 30%,
+    oklch(0.97 0.005 285 / 0.4) 45%,
+    oklch(0.65 0.22 295 / 0.15) 52%,
+    transparent 65%
   );
   transform: translateX(-130%);
-  transition: transform 0.8s ease;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
   pointer-events: none;
 }
 .group:hover .style-cover-shine::after {
   transform: translateX(130%);
+}
+
+/* 同款卡片 hover 3D 透视 */
+.style-cover {
+  transform-style: preserve-3d;
+  perspective: 600px;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.group:hover .style-cover {
+  transform: translateZ(8px) scale(1.02);
 }
 
 /* ============================================
@@ -588,18 +786,24 @@ html.light-theme .shadow-glow {
     var(--bai)
   );
   background-size: 300% 300%;
-  animation: gradient-border 4s ease infinite;
+  animation: none;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--motion-fast) ease;
 }
 
 .gradient-border:hover::before {
   opacity: 1;
+  animation: gradient-border 6s ease-in-out infinite;
 }
+
+/* 统一表面层级：默认边界清晰，光效只在交互态出现 */
+.surface-1 { background: var(--surface); }
+.surface-2 { background: var(--surface-2); }
+.surface-3 { background: var(--surface-3); }
 
 /* 页面切换过渡 */
 .page-transition-enter {
@@ -610,7 +814,7 @@ html.light-theme .shadow-glow {
 .page-transition-enter-active {
   opacity: 1;
   transform: translateY(0);
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition: opacity var(--motion-base) ease, transform var(--motion-base) var(--motion-ease);
 }
 
 /* 工具提示样式 */
@@ -697,6 +901,92 @@ html.light-theme .shadow-glow {
   animation: progress-fill 1s ease-out;
 }
 
+/* 隐藏滚动条（横向滑动容器使用） */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================
+   移动端响应式适配
+   ============================================ */
+
+/* 小屏 (<640px) 优化 */
+@media (max-width: 640px) {
+  /* Bento 卡片降低最小高度,紧凑排列 */
+  .bento-tile {
+    border-radius: 1rem;
+  }
+
+  /* Donut 饼图移动端增大 */
+  .donut-container {
+    width: 120px !important;
+    height: 120px !important;
+  }
+
+  /* 导航按钮增大触控区 */
+  .nav-mobile-touch {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* 横向滚动容器增加 snap */
+  .snap-x-mandatory {
+    scroll-snap-type: x mandatory;
+  }
+  .snap-center {
+    scroll-snap-align: center;
+  }
+}
+
+/* 触控设备优化 (hover:none) */
+@media (hover: none) and (pointer: coarse) {
+  /* 禁用 hover 专属效果,改用 active */
+  .bento-tile:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: 0 0 0 1px var(--border);
+  }
+
+  .bento-tile:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+
+  .bento-tile::after {
+    display: none;
+  }
+
+  .style-cover-shine::after {
+    display: none;
+  }
+
+  /* 触控设备增大交互目标 */
+  .nav-mobile-touch {
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* 禁用装饰性动画,节省性能 */
+  .hero-halo {
+    animation-duration: 16s;
+  }
+
+  .cp-noise {
+    display: none;
+  }
+}
+
+/* 超小屏 (<380px) 微调 */
+@media (max-width: 380px) {
+  .bento-tile {
+    border-radius: 0.875rem;
+  }
+}
+
 /* ============================================
    浅色主题
    ============================================ */
@@ -714,8 +1004,10 @@ html.light-theme {
   --cp-glow: oklch(0.50 0.25 295);
   --cp-soft: oklch(0.60 0.15 290);
   --rose: oklch(0.55 0.22 20);
+  --amber: oklch(0.68 0.15 75);
   --muted: oklch(0.45 0.02 285);
   --border: oklch(0.88 0.02 285);
+  --surface-border: oklch(0.84 0.025 285);
   --border-glow: oklch(0.60 0.12 290);
 }
 
@@ -744,6 +1036,15 @@ html.light-theme .style-cover-gradient::after {
   background: linear-gradient(to top, var(--surface) 0%, transparent 60%);
 }
 
+html.light-theme .home-hero-overlay {
+  background: linear-gradient(
+    to top,
+    oklch(0.12 0.025 285 / 0.72) 0%,
+    oklch(0.12 0.025 285 / 0.24) 58%,
+    oklch(0.12 0.025 285 / 0.08) 100%
+  );
+}
+
 html.light-theme .cp-stars {
   opacity: 0.3;
 }
@@ -758,7 +1059,11 @@ mark.search-highlight {
 
 /* 减少动画偏好 */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
   .ripple { animation: none; }
+  .animate-pulse { animation: none !important; }
   .heart-particle { animation: none; }
   .sparkle-particle { animation: none; }
   .bounce-in { animation: none; }
@@ -768,4 +1073,29 @@ mark.search-highlight {
   .tag-hover:hover { animation: none; }
   .mascot-clicked { animation: none; }
   .gradient-border::before { animation: none; }
+  .gradient-border:hover::before { animation: none; }
+  .bento-tile::after { animation: none; }
+  .skeleton { animation: none; }
+  .cp-noise { animation: none; }
+  .hero-halo { animation: none; }
+}
+
+/* 锚点滚动目标（避免被固定导航遮挡） */
+.scroll-target {
+  scroll-margin-top: 6rem;
+  scroll-snap-align: start;
+}
+
+/* 阅读进度环 */
+.reading-ring {
+  filter: drop-shadow(0 0 6px oklch(0.65 0.22 295 / 0.4));
+}
+
+/* 活动段落指示器 */
+.section-dot {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.section-dot.active {
+  background: var(--cp);
+  box-shadow: 0 0 12px oklch(0.65 0.22 295 / 0.5);
 }

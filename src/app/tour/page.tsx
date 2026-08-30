@@ -18,7 +18,7 @@ export default function TourPage() {
           <DogMascot className="w-5 h-5 opacity-70" />
           <PigMascot className="w-5 h-5 opacity-70" />
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-semibold tracking-tight">
+        <h1 className="max-w-[20rem] text-balance font-serif text-3xl sm:max-w-none sm:text-4xl md:text-5xl font-extrabold tracking-tight">
           <em className="text-gradient-cp not-italic">PRIVATE SIGNAL</em> 杭州站
         </h1>
         <p className="text-muted text-sm max-w-xl">2026.08.22 周六 19:00 · 杭州新天地太阳剧场</p>

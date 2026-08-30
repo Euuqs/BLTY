@@ -58,6 +58,10 @@ function CountdownNumber({ days, isToday }: { days: number; isToday: boolean }) 
   const [displayDays, setDisplayDays] = useState(days);
 
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const timer = window.setTimeout(() => setDisplayDays(days), 0);
+      return () => window.clearTimeout(timer);
+    }
     const start = displayDays;
     const end = days;
     if (start === end) return;
@@ -117,12 +121,12 @@ export function BirthdayCountdown() {
   const { spawnParticles, burstConfetti } = useFeedback();
   const [celebratedKey, setCelebratedKey] = useState<string | null>(null);
 
-  const handleCardClick = (
-    e: React.MouseEvent<HTMLDivElement>,
+  const handleCardActivate = (
+    target: HTMLElement,
     birthday: typeof BIRTHDAYS[number],
     isToday: boolean
   ) => {
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
     const x = rect.left + rect.width / 2;
     const y = rect.top + rect.height / 2;
 
@@ -135,7 +139,7 @@ export function BirthdayCountdown() {
   };
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" aria-label="三人生日倒计时" aria-live="polite" aria-atomic="false">
       {BIRTHDAYS.map(({ key, name, month, day, icon: Icon, dot, text, glow, border, emoji, message }) => {
         let thisYear = new Date(now.getFullYear(), month - 1, day);
         if (diffDays(thisYear, now) < 0) thisYear = new Date(now.getFullYear() + 1, month - 1, day);
@@ -144,12 +148,21 @@ export function BirthdayCountdown() {
         const isSoon = days > 0 && days <= 7;
 
         return (
-          <motion.div
+          <motion.button
+            type="button"
             key={key}
             whileHover={{ y: -3, scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={(e) => handleCardClick(e, { key, name, month, day, icon: Icon, dot, text, glow, border, emoji, message } as typeof BIRTHDAYS[number], isToday)}
+            aria-label={`${name}生日，${month}月${day}日，${isToday ? "就是今天" : `还有 ${days} 天`}，点击互动`}
+            onClick={(e) => handleCardActivate(e.currentTarget, { key, name, month, day, icon: Icon, dot, text, glow, border, emoji, message } as typeof BIRTHDAYS[number], isToday)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleCardActivate(e.currentTarget, { key, name, month, day, icon: Icon, dot, text, glow, border, emoji, message } as typeof BIRTHDAYS[number], isToday);
+              }
+            }}
             className={`
+              w-full text-left
               group relative flex items-center gap-3.5 px-4 py-3.5 rounded-xl
               bg-surface/60 border backdrop-blur-sm cursor-pointer
               transition-all duration-300 overflow-hidden
@@ -164,6 +177,7 @@ export function BirthdayCountdown() {
                 animate={{ opacity: [0.3, 0.6, 0.3] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="absolute top-2 right-2"
+                aria-hidden="true"
               >
                 <span className="text-xs">{"\u{1F525}"}</span>
               </motion.div>
@@ -172,8 +186,8 @@ export function BirthdayCountdown() {
             <div className="relative shrink-0">
               <motion.div
                 whileHover={{ scale: 1.15, rotate: 10 }}
-                whileTap={{ scale: 0.9 }}
                 className="relative"
+                aria-hidden="true"
               >
                 <Icon className="w-9 h-9 opacity-90 relative" />
                 <span className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${dot}`} />
@@ -204,7 +218,7 @@ export function BirthdayCountdown() {
             </AnimatePresence>
 
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 pointer-events-none" />
-          </motion.div>
+          </motion.button>
         );
       })}
     </div>

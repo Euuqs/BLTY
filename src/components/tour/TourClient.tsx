@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo } from "react";
 import { motion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
@@ -7,6 +8,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { useNow } from "@/lib/useNow";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 import { DogMascot, PigMascot, Rose, Paw, Heart, ArrowUpRight } from "@/components/mascot/Mascots";
+import { MetaIcon } from "@/components/ui/MetaIcon";
 
 const VENUE = {
   name: "杭州新天地太阳剧场",
@@ -25,14 +27,14 @@ const CHECKIN_SPOTS = [
     period: "08.21 - 08.23",
     description: "距太阳剧场步行五分钟，整座商场铺满柏里挑怡的夏日信号",
     highlights: [
-      { icon: "🎬", label: "中庭大屏轮播", detail: "120次/天" },
-      { icon: "🖼️", label: "互动墙", detail: "1面" },
-      { icon: "🌸", label: "小花墙信箱", detail: "200张明信片" },
-      { icon: "🚩", label: "吊旗", detail: "170面" },
-      { icon: "📸", label: "合影框", detail: "5个" },
-      { icon: "🧭", label: "指示牌", detail: "4块" },
-      { icon: "📺", label: "立屏", detail: "8块" },
-      { icon: "🚇", label: "地铁出口楼梯", detail: "装饰通道" },
+      { icon: "screen", label: "中庭大屏轮播", detail: "120次/天" },
+      { icon: "wall", label: "互动墙", detail: "1面" },
+      { icon: "flower", label: "小花墙信箱", detail: "200张明信片" },
+      { icon: "flag", label: "吊旗", detail: "170面" },
+      { icon: "camera", label: "合影框", detail: "5个" },
+      { icon: "sign", label: "指示牌", detail: "4块" },
+      { icon: "screen", label: "立屏", detail: "8块" },
+      { icon: "metro", label: "地铁出口楼梯", detail: "装饰通道" },
     ],
     color: "bai",
     accent: "from-bai/20 via-bai/5 to-transparent",
@@ -47,8 +49,8 @@ const CHECKIN_SPOTS = [
     period: "巡演期间",
     description: "把夏天最想说的话，放进每个人都会经过的路口",
     highlights: [
-      { icon: "📍", label: "核心商圈大屏", detail: "投放中" },
-      { icon: "📷", label: "打卡建议", detail: "城市中心定位" },
+      { icon: "pin", label: "核心商圈大屏", detail: "投放中" },
+      { icon: "camera", label: "打卡建议", detail: "城市中心定位" },
     ],
     color: "cp",
     accent: "from-cp/20 via-cp/5 to-transparent",
@@ -63,12 +65,12 @@ const CHECKIN_SPOTS = [
     period: "08.22 演出当天",
     description: "让风穿过空地，有一面旗替我们摇晃；让花立在门口，有人愿意停下",
     highlights: [
-      { icon: "🖼️", label: "巨幅海报", detail: "10×6m × 4幅" },
-      { icon: "🌺", label: "花墙", detail: "10m × 1座" },
-      { icon: "📋", label: "KT板", detail: "10m × 2块" },
-      { icon: "✍️", label: "留言板", detail: "7m × 1块" },
-      { icon: "🚩", label: "注水旗", detail: "27面" },
-      { icon: "🎈", label: "空飘", detail: "8个" },
+      { icon: "wall", label: "巨幅海报", detail: "10×6m × 4幅" },
+      { icon: "flower", label: "花墙", detail: "10m × 1座" },
+      { icon: "clipboard", label: "KT板", detail: "10m × 2块" },
+      { icon: "sign", label: "留言板", detail: "7m × 1块" },
+      { icon: "flag", label: "注水旗", detail: "27面" },
+      { icon: "balloon", label: "空飘", detail: "8个" },
     ],
     color: "zhu",
     accent: "from-zhu/20 via-zhu/5 to-transparent",
@@ -78,10 +80,10 @@ const CHECKIN_SPOTS = [
 ] as const;
 
 const TRANSPORT_TIPS = [
-  { icon: "🚇", label: "地铁", detail: "4号线/5号线 杭州西站/东新园站" },
-  { icon: "🚗", label: "自驾", detail: "导航「新天地太阳剧场」，商场有地下停车场" },
-  { icon: "🚌", label: "公交", detail: "东文街站 / 杭行路站" },
-  { icon: "🚶", label: "步行", detail: "痛楼商场距剧场步行5分钟" },
+  { icon: "metro", label: "地铁", detail: "4号线/5号线 杭州西站/东新园站" },
+  { icon: "car", label: "自驾", detail: "导航「新天地太阳剧场」，商场有地下停车场" },
+  { icon: "bus", label: "公交", detail: "东文街站 / 杭行路站" },
+  { icon: "walk", label: "步行", detail: "痛楼商场距剧场步行5分钟" },
 ];
 
 function useCountdown(targetDate: string, targetTime?: string) {
@@ -130,7 +132,16 @@ function HeroSection() {
   return (
     <Reveal>
       <BentoTile className="relative overflow-hidden p-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-cp/15 via-surface to-surface pointer-events-none" />
+        <Image
+          src="/static/hero/stage-hero.jpg"
+          alt="PRIVATE SIGNAL 演唱会舞台"
+          fill
+          sizes="(max-width: 1024px) 100vw, 1024px"
+          priority
+          className="object-cover opacity-15 transition-transform duration-700 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-surface/95 via-surface/90 to-surface/95 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-br from-cp/15 via-surface/50 to-surface pointer-events-none" />
         <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-cp/10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-bai/10 blur-3xl pointer-events-none" />
 
@@ -249,10 +260,10 @@ function QuickInfoSection() {
     <Reveal delay={0.05}>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { icon: "📅", label: "演出日期", value: "08月22日(六)", color: "text-cp" },
-          { icon: "⏰", label: "开场时间", value: "19:00", color: "text-zhu" },
-          { icon: "🎫", label: "检票入场", value: "17:30", color: "text-bai" },
-          { icon: "📍", label: "演出地点", value: "新天地太阳剧场", color: "text-foreground" },
+          { icon: "calendar", label: "演出日期", value: "08月22日(六)", color: "text-cp" },
+          { icon: "clock", label: "开场时间", value: "19:00", color: "text-zhu" },
+          { icon: "ticket", label: "检票入场", value: "17:30", color: "text-bai" },
+          { icon: "pin", label: "演出地点", value: "新天地太阳剧场", color: "text-foreground" },
         ].map((item, i) => (
           <motion.div
             key={i}
@@ -261,7 +272,7 @@ function QuickInfoSection() {
             onClick={createRipple}
             className="bento-tile p-4 flex flex-col items-center gap-1.5 cursor-pointer ripple-container"
           >
-            <span className="text-2xl">{item.icon}</span>
+            <MetaIcon name={item.icon} className={`w-7 h-7 ${item.color}`} />
             <span className="font-mono text-[9px] text-muted tracking-widest uppercase">{item.label}</span>
             <span className={`font-serif text-base font-semibold ${item.color}`}>{item.value}</span>
           </motion.div>
@@ -291,7 +302,7 @@ function VenueGuideSection() {
 
             <div className="flex flex-col gap-4">
               <div className="flex items-start gap-3">
-                <span className="text-xl shrink-0">🏟️</span>
+                <MetaIcon name="stadium" className="w-6 h-6 text-cp shrink-0" />
                 <div>
                   <h3 className="font-serif text-lg font-semibold">{VENUE.name}</h3>
                   <p className="text-xs text-muted mt-1">{VENUE.address}</p>
@@ -305,7 +316,7 @@ function VenueGuideSection() {
                 <div className="grid grid-cols-2 gap-2">
                   {TRANSPORT_TIPS.map((tip, i) => (
                     <div key={i} className="flex items-start gap-2 p-2.5 rounded-lg bg-surface-2/50 border border-border/40">
-                      <span className="text-base shrink-0">{tip.icon}</span>
+                      <MetaIcon name={tip.icon} className="w-5 h-5 text-cp shrink-0" />
                       <div className="min-w-0">
                         <span className="font-mono text-[10px] text-cp tracking-wider">{tip.label}</span>
                         <p className="text-xs text-muted leading-snug mt-0.5">{tip.detail}</p>
@@ -426,7 +437,7 @@ function CheckinCard({ spot, index }: { spot: (typeof CHECKIN_SPOTS)[number]; in
                 onClick={handleCardClick}
                 className="flex items-center gap-2 p-2 rounded-lg bg-surface-2/40 border border-border/30 cursor-pointer ripple-container"
               >
-                <span className="text-sm shrink-0">{h.icon}</span>
+                <MetaIcon name={h.icon} className="w-4 h-4 text-cp shrink-0" />
                 <div className="min-w-0">
                   <p className="text-[11px] font-medium truncate">{h.label}</p>
                   <p className="text-[10px] text-muted truncate">{h.detail}</p>
@@ -521,7 +532,8 @@ function CheckinChecklist() {
           <div className="mt-4 pt-4 border-t border-border/60 flex items-center gap-3">
             <Paw className="w-4 h-4 text-bai/50" />
             <p className="text-[11px] text-muted leading-relaxed flex-1">
-              💡 小贴士：痛楼投放时间 08.21-08.23，建议先逛痛楼再前往剧场。小花墙信箱旁准备了 200 张明信片，先到先得。
+              <MetaIcon name="lightbulb" className="w-3.5 h-3.5 text-amber inline-block align-[-2px] mr-1" />
+              小贴士：痛楼投放时间 08.21-08.23，建议先逛痛楼再前往剧场。小花墙信箱旁准备了 200 张明信片，先到先得。
             </p>
           </div>
         </BentoTile>

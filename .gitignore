@@ -46,5 +46,6 @@ next-env.d.ts
 .velite
 
 # tool directories
+/.agents/
 .omo/
 .opencode/

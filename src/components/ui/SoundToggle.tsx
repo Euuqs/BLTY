@@ -11,7 +11,7 @@ export function SoundToggle() {
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.9 }}
       onClick={toggle}
-      className="relative w-9 h-9 rounded-lg bg-surface/50 border border-border flex items-center justify-center text-muted hover:text-cp transition-colors btn-press"
+      className="relative w-11 h-11 lg:w-9 lg:h-9 rounded-lg bg-surface/50 border border-border flex items-center justify-center text-muted hover:text-cp transition-colors btn-press"
       aria-label={enabled ? "关闭音效" : "开启音效"}
       title={enabled ? "音效已开启" : "音效已关闭"}
     >

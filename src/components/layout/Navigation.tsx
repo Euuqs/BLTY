@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 import { SearchPalette } from "@/components/ui/SearchPalette";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { SoundToggle } from "@/components/ui/SoundToggle";
+import { MetaIcon } from "@/components/ui/MetaIcon";
 
 const navItems = [
   { href: "/", label: "首页", mono: "00" },
@@ -19,9 +21,22 @@ const navItems = [
 export function Navigation() {
   const pathname = usePathname();
   const { createRipple } = useFeedback();
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+  const [mobileNavHasMore, setMobileNavHasMore] = useState(false);
 
   const isActive = (href: string) =>
     href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+  useEffect(() => {
+    const nav = mobileNavRef.current;
+    if (!nav) return;
+    const updateHint = () => {
+      setMobileNavHasMore(nav.scrollWidth - nav.clientWidth - nav.scrollLeft > 8);
+    };
+    updateHint();
+    window.addEventListener("resize", updateHint);
+    return () => window.removeEventListener("resize", updateHint);
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-xl bg-background/60 border-b border-border/60">
@@ -29,7 +44,7 @@ export function Navigation() {
         <Link
           href="/"
           prefetch={false}
-          className="flex items-center gap-2.5 group ripple-container rounded-lg px-2 py-1 -mx-2"
+          className="flex min-h-11 shrink-0 items-center gap-2.5 whitespace-nowrap group ripple-container rounded-lg px-2 py-1 -mx-2"
           onClick={(e) => createRipple(e)}
         >
           <div className="relative flex items-center -space-x-1">
@@ -48,7 +63,7 @@ export function Navigation() {
         </Link>
 
         <div className="flex items-center gap-1">
-          <div className="hidden sm:flex items-center gap-0.5">
+          <div className="hidden lg:flex items-center gap-0.5">
             {navItems.map((item) => {
               const active = isActive(item.href);
               return (
@@ -57,9 +72,9 @@ export function Navigation() {
                   href={item.href}
                   prefetch={false}
                   className={
-                    "relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 btn-press ripple-container " +
+                    "relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-all duration-200 btn-press ripple-container border border-transparent " +
                     (active
-                      ? "text-foreground bg-surface"
+                      ? "text-foreground bg-surface-2 border border-cp/20"
                       : "text-muted hover:text-foreground hover:bg-surface")
                   }
                   onClick={(e) => createRipple(e)}
@@ -75,7 +90,7 @@ export function Navigation() {
                   {active && (
                     <motion.span
                       layoutId="nav-underline"
-                      className="absolute left-3 right-3 -bottom-px h-[2px] rounded-full bg-gradient-to-r from-bai via-cp to-zhu"
+                      className="absolute left-3 right-3 -bottom-px h-[2px] rounded-full bg-gradient-to-r from-bai via-cp to-zhu shadow-[0_0_8px_oklch(0.65_0.22_295/0.5)]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -86,7 +101,7 @@ export function Navigation() {
 
           <div className="flex items-center gap-1.5 ml-2 pl-2 border-l border-border/50">
             <SearchPalette />
-            <div className="hidden sm:flex items-center gap-1.5">
+            <div className="hidden lg:flex items-center gap-1.5">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -98,7 +113,7 @@ export function Navigation() {
                 aria-label="提意见"
                 title="意见箱"
               >
-                <span>{"\u{1F4A1}"}</span>
+                <MetaIcon name="lightbulb" className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">意见</span>
               </motion.button>
               <ThemeToggle />
@@ -109,33 +124,57 @@ export function Navigation() {
       </div>
 
       {/* Mobile nav */}
-      <div className="sm:hidden flex items-center justify-center gap-1 pb-2 px-4 overflow-x-auto safe-bottom">
-        {navItems.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              prefetch={false}
-              className={
-                "flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs transition-all whitespace-nowrap ripple-container btn-press " +
-                (active
-                  ? "text-foreground bg-surface"
-                  : "text-muted hover:text-foreground hover:bg-surface/60")
-              }
-              onClick={(e) => createRipple(e)}
-            >
-              <span className={`font-mono text-[9px] ${active ? "text-cp" : "opacity-40"}`}>
-                {item.mono}
-              </span>
-              {item.label}
-            </Link>
-          );
-        })}
-        <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border/50">
-          <ThemeToggle />
-          <SoundToggle />
+      <div className="lg:hidden relative">
+        <div
+          ref={mobileNavRef}
+          onScroll={() => {
+            const nav = mobileNavRef.current;
+            if (nav) setMobileNavHasMore(nav.scrollWidth - nav.clientWidth - nav.scrollLeft > 8);
+          }}
+          className="flex items-center gap-1 pb-2 px-4 pr-12 overflow-x-auto scrollbar-hide safe-bottom snap-x-mandatory"
+        >
+          {navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                prefetch={false}
+                className={
+                  "relative flex items-center gap-1 px-4 py-2.5 rounded-lg text-sm transition-all whitespace-nowrap shrink-0 ripple-container btn-press snap-center min-h-[44px] border border-transparent " +
+                  (active
+                    ? "text-foreground bg-surface-2 border border-cp/20"
+                    : "text-muted hover:text-foreground hover:bg-surface/60")
+                }
+                onClick={(e) => createRipple(e)}
+              >
+                <span className={`font-mono text-[9px] ${active ? "text-cp" : "opacity-40"}`}>
+                  {item.mono}
+                </span>
+                {item.label}
+                {active && (
+                  <motion.span
+                    layoutId="nav-underline"
+                    className="absolute left-3 right-3 -bottom-px h-[2px] rounded-full bg-gradient-to-r from-bai via-cp to-zhu shadow-[0_0_8px_oklch(0.65_0.22_295/0.5)]"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+          <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border/50 shrink-0">
+            <ThemeToggle />
+            <SoundToggle />
+          </div>
         </div>
+        {mobileNavHasMore && (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-0 top-0 bottom-2 flex w-10 items-center justify-end bg-gradient-to-l from-background via-background/90 to-transparent pr-2 text-lg text-cp/80"
+          >
+            ›
+          </span>
+        )}
       </div>
     </nav>
   );

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { MotionConfig } from "motion/react";
 import "@fontsource-variable/fraunces";
 import "@fontsource/manrope";
@@ -16,6 +17,11 @@ import { SoundProvider } from "@/components/ui/SoundProvider";
 import { MouseGlow } from "@/components/ui/MouseGlow";
 import { EasterEggs } from "@/components/ui/EasterEggs";
 import { PageTransition } from "@/components/ui/PageTransition";
+import { KeyboardHints } from "@/components/ui/KeyboardHints";
+import { ReadingIndicator } from "@/components/ui/ReadingIndicator";
+import { NowProvider } from "@/lib/useNow";
+
+const initialTimestamp = Date.now();
 
 export const viewport: Viewport = {
   themeColor: "#120d20",
@@ -57,7 +63,10 @@ export const metadata: Metadata = {
     images: ["/hero-wedding-og.jpg"],
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
   },
 };
 
@@ -69,41 +78,50 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className="h-full" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f6f4fb":"#120d20"}catch(e){}`,
-          }}
-        />
+        <Script id="theme-init" strategy="beforeInteractive">
+          {`try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f6f4fb":"#120d20"}catch(e){}`}
+        </Script>
       </head>
       <body className="min-h-full flex flex-col font-sans">
-        <ThemeProvider>
-          <SoundProvider>
-            <MotionConfig reducedMotion="user">
-              <FeedbackProvider>
-                <div className="cp-atmosphere" />
-                <div className="cp-stars" />
-                <MouseGlow />
-                <ScrollProgress />
-                <Navigation />
-                <main className="flex-1 px-4 md:px-8 lg:px-12 py-8 max-w-7xl mx-auto w-full">
-                  <PageTransition>{children}</PageTransition>
-                </main>
-                <footer className="py-10 text-center flex flex-col items-center gap-3">
-                  <FooterMascots />
-                  <p className="text-muted text-xs font-mono tracking-wider">
-                    心动穿越千里 · 所爱柏里挑怡
-                  </p>
-                  <p className="text-muted/50 text-[10px] font-mono">
-                    非官方应援站 · 周/月更
-                  </p>
-                </footer>
-                <BackToTop />
-                <FeedbackModal />
-                <EasterEggs />
-              </FeedbackProvider>
-            </MotionConfig>
-          </SoundProvider>
-        </ThemeProvider>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:border focus:border-cp/50 focus:bg-surface-3 focus:px-4 focus:py-3 focus:text-sm focus:text-foreground focus:shadow-lg"
+        >
+          跳到主要内容
+        </a>
+        <NowProvider initialTimestamp={initialTimestamp}>
+          <ThemeProvider>
+            <SoundProvider>
+              <MotionConfig reducedMotion="user">
+                <FeedbackProvider>
+                  <div className="cp-atmosphere" />
+                  <div className="cp-stars" />
+                  <div className="cp-noise" />
+                  <MouseGlow />
+                  <ScrollProgress />
+                  <ReadingIndicator />
+                  <Navigation />
+                  <main id="main-content" className="flex-1 px-4 md:px-8 lg:px-12 py-8 max-w-7xl mx-auto w-full">
+                    <PageTransition>{children}</PageTransition>
+                  </main>
+                  <footer className="py-10 text-center flex flex-col items-center gap-3">
+                    <FooterMascots />
+                    <p className="text-muted text-xs font-mono tracking-wider">
+                      心动穿越千里 · 所爱柏里挑怡
+                    </p>
+                    <p className="text-muted/50 text-[10px] font-mono">
+                      非官方应援站 · 周/月更
+                    </p>
+                  </footer>
+                  <BackToTop />
+                  <FeedbackModal />
+                  <EasterEggs />
+                  <KeyboardHints />
+                </FeedbackProvider>
+              </MotionConfig>
+            </SoundProvider>
+          </ThemeProvider>
+        </NowProvider>
       </body>
     </html>
   );

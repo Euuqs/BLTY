@@ -1,5 +1,9 @@
 import type { MetadataRoute } from "next";
-import { sameStyles, schedules, feeds } from "@/lib/velite";
+import {
+  publishedFeeds as feeds,
+  publishedSameStyles as sameStyles,
+  publishedSchedules as schedules,
+} from "@/lib/velite";
 
 const BASE_URL = "https://bailitiaoyi.app";
 

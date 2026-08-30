@@ -22,6 +22,11 @@ export function EasterEggs() {
   const [easterEmoji, setEasterEmoji] = useState<string | null>(null);
   const { burstConfetti, spawnParticles } = useFeedback();
 
+  const dismissNotification = () => {
+    setNotification(null);
+    setEasterEmoji(null);
+  };
+
   const showNotification = useCallback((emoji: string, message: string, triggerConfetti = false, particle?: "hearts" | "sparkles") => {
     setEasterEmoji(emoji);
     setNotification(message);
@@ -64,11 +69,15 @@ export function EasterEggs() {
     return () => window.removeEventListener("keydown", handler);
   }, [konamiIndex, showNotification]);
 
-  // Welcome message on every visit + date-based easter eggs
+  // Welcome message once per session + date-based easter eggs
   useEffect(() => {
-    const welcomeTimer = setTimeout(() => {
-      showNotification("\u{1F49C}", "欢迎来看柏里挑怡", false, "hearts");
-    }, 800);
+    let welcomeTimer: ReturnType<typeof setTimeout> | undefined;
+    if (!sessionStorage.getItem("cp-welcome-shown")) {
+      sessionStorage.setItem("cp-welcome-shown", "1");
+      welcomeTimer = setTimeout(() => {
+        showNotification("\u{1F49C}", "欢迎来看柏里挑怡");
+      }, 1400);
+    }
 
     const now = new Date();
     const mmdd = `${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}`;
@@ -81,7 +90,7 @@ export function EasterEggs() {
     }
 
     return () => {
-      clearTimeout(welcomeTimer);
+      if (welcomeTimer) clearTimeout(welcomeTimer);
       if (eggTimer) clearTimeout(eggTimer);
     };
   }, [showNotification]);
@@ -110,14 +119,25 @@ export function EasterEggs() {
     <AnimatePresence>
       {notification && (
         <motion.div
-          initial={{ opacity: 0, y: -50, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -50, scale: 0.8 }}
+          initial={{ opacity: 0, x: 24, scale: 0.94 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          exit={{ opacity: 0, x: 24, scale: 0.94 }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="fixed top-20 left-1/2 -translate-x-1/2 z-[200] px-6 py-3 rounded-2xl bg-surface/90 backdrop-blur-lg border border-cp/30 shadow-glow flex items-center gap-3"
+          className="fixed top-20 right-4 sm:right-6 z-[200] max-w-[calc(100vw-2rem)] px-4 py-3 sm:px-5 rounded-2xl bg-surface/95 backdrop-blur-lg border border-cp/25 shadow-lg flex items-center gap-3"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
         >
-          <span className="text-3xl animate-bounce-in">{easterEmoji}</span>
-          <span className="text-sm font-bold text-foreground">{notification}</span>
+          <span aria-hidden="true" className="text-3xl animate-bounce-in">{easterEmoji}</span>
+          <span className="text-sm font-bold text-foreground whitespace-nowrap">{notification}</span>
+          <button
+            type="button"
+            onClick={dismissNotification}
+            className="ml-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground"
+            aria-label="关闭提示"
+          >
+            ×
+          </button>
         </motion.div>
       )}
     </AnimatePresence>

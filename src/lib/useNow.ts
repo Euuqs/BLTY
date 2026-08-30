@@ -1,22 +1,33 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { createContext, createElement, useContext, useEffect, useState, type ReactNode } from "react";
 
-let cachedNow = new Date();
+const NowContext = createContext<Date | null>(null);
 
-function subscribe(callback: () => void) {
-  const id = setInterval(() => {
-    cachedNow = new Date();
-    callback();
-  }, 60_000);
-  return () => clearInterval(id);
+export function NowProvider({
+  children,
+  initialTimestamp,
+}: {
+  children: ReactNode;
+  initialTimestamp: number;
+}) {
+  const [now, setNow] = useState(() => new Date(initialTimestamp));
+
+  useEffect(() => {
+    const refresh = () => setNow(new Date());
+    const timeoutId = setTimeout(refresh, 0);
+    const id = setInterval(refresh, 60_000);
+    return () => {
+      clearTimeout(timeoutId);
+      clearInterval(id);
+    };
+  }, []);
+
+  return createElement(NowContext.Provider, { value: now }, children);
 }
 
-function getSnapshot() {
-  return cachedNow;
-}
-
-/** 订阅当前时间，每分钟刷新一次（避免 hydration 不一致） */
 export function useNow() {
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const now = useContext(NowContext);
+  if (!now) throw new Error("useNow must be used within NowProvider");
+  return now;
 }

@@ -114,7 +114,8 @@ export function SearchPalette() {
           setActiveIndex(0);
           setOpen(true);
         }}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border text-muted text-xs font-mono hover:border-cp/40 hover:text-foreground transition-all btn-press"
+        className="flex min-h-11 min-w-11 sm:min-h-9 items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border text-muted text-xs font-mono hover:border-cp/40 hover:text-foreground transition-all btn-press"
+        aria-label="打开全站搜索"
       >
         <span>{"\u{1F50D}"}</span>
         <span className="hidden sm:inline">搜索</span>

@@ -1,4 +1,4 @@
-import { sameStyles } from "@/lib/velite";
+import { publishedSameStyles as sameStyles } from "@/lib/velite";
 import { SameStylesClient } from "@/components/same-styles/SameStylesClient";
 
 export const metadata = {

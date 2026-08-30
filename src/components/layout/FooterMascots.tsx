@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "motion/react";
 import { DogMascot, PigMascot, Paw, Rose, Heart } from "@/components/mascot/Mascots";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
+import { useNow } from "@/lib/useNow";
 
 export function FooterMascots() {
   const { spawnParticles } = useFeedback();
@@ -35,19 +36,33 @@ export function FooterMascots() {
     return "最爱你啦！";
   };
 
+  const now = useNow();
   const message = getMessage();
 
+  const dateTimeStr = useMemo(() => {
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const h = String(now.getHours()).padStart(2, "0");
+    const min = String(now.getMinutes()).padStart(2, "0");
+    return `${y}-${m}-${d} ${h}:${min}`;
+  }, [now]);
+
+  const year = now.getFullYear();
+
   return (
-    <div className="relative flex flex-col items-center gap-1.5">
+    <div className="relative flex flex-col items-center gap-2">
       <div className="flex items-center gap-4">
-        <motion.div
+        <motion.button
+          type="button"
           whileHover={{ scale: 1.15, rotate: -10 }}
           whileTap={{ scale: 0.9 }}
           onClick={handleBaiClick}
-          className="cursor-pointer"
+          className="flex h-11 w-11 items-center justify-center rounded-full cursor-pointer"
+          aria-label="和柏欣妤萌宠互动"
         >
           <DogMascot className="mascot-float w-9 h-9 opacity-80 hover:opacity-100 transition-opacity" />
-        </motion.div>
+        </motion.button>
         <motion.span
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
@@ -55,18 +70,33 @@ export function FooterMascots() {
         >
           <Heart className="w-4 h-4 text-cp/50" />
         </motion.span>
-        <motion.div
+        <motion.button
+          type="button"
           whileHover={{ scale: 1.15, rotate: 10 }}
           whileTap={{ scale: 0.9 }}
           onClick={handleZhuClick}
-          className="cursor-pointer"
+          className="flex h-11 w-11 items-center justify-center rounded-full cursor-pointer"
+          aria-label="和朱怡欣萌宠互动"
         >
           <PigMascot className="mascot-float mascot-float-delayed w-9 h-9 opacity-80 hover:opacity-100 transition-opacity" />
-        </motion.div>
+        </motion.button>
       </div>
       <Paw className="absolute -bottom-2 -left-8 w-4 h-4 text-muted/20 rotate-[-16deg]" />
       <Paw className="absolute -bottom-2 -right-8 w-3.5 h-3.5 text-muted/15 rotate-[12deg]" />
-      <Rose className="mascot-float absolute -top-3 right-10 w-4 h-4 text-rose/40 rotate-[18deg]" />
+      <motion.div
+        className="absolute -top-3 right-10"
+        animate={{
+          y: [0, -4, 0],
+          rotate: [18, 25, 18],
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <Rose className="w-5 h-5 text-rose/60 drop-shadow-[0_0_8px_oklch(0.58_0.22_20/0.5)]" />
+      </motion.div>
       {message && (
         <motion.p
           initial={{ opacity: 0, y: 5, scale: 0.9 }}
@@ -76,6 +106,19 @@ export function FooterMascots() {
           {message}
         </motion.p>
       )}
+      <div className="flex flex-col items-center gap-1 mt-2 pt-2 border-t border-border/40 w-full">
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-[10px] font-mono text-muted/60 tracking-wider flex items-center gap-1.5"
+        >
+          <span className="w-1 h-1 rounded-full bg-cp animate-pulse" />
+          {dateTimeStr}
+        </motion.p>
+        <p className="text-[9px] font-mono text-muted/40">
+          &copy; {year} 柏里挑怡 · 心动穿越千里
+        </p>
+      </div>
     </div>
   );
 }

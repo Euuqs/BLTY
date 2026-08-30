@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
 import { MonthFilter } from "@/components/ui/MonthFilter";
 import { TypeIcon } from "@/components/ui/TypeIcon";
+import { MetaIcon } from "@/components/ui/MetaIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 import { useNow } from "@/lib/useNow";
@@ -18,10 +19,10 @@ const getColor = (m: string) => m === "A" ? "text-bai" : m === "B" ? "text-zhu" 
 type MemberFilter = "all" | "A" | "B" | "both";
 
 const memberOptions: { key: MemberFilter; label: string; dot: string; activeClass: string }[] = [
-  { key: "all", label: "全部", dot: "", activeClass: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]" },
-  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-bai text-background border-bai shadow-[0_0_12px_oklch(0.92_0.01_260/0.4)]" },
-  { key: "B", label: "朱怡欣", dot: "dot-zhu", activeClass: "bg-zhu text-background border-zhu shadow-[0_0_12px_oklch(0.55_0.20_250/0.4)]" },
-  { key: "both", label: "双人", dot: "dot-cp", activeClass: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]" },
+  { key: "all", label: "全部", dot: "", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
+  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-bai text-background border-bai shadow-[0_0_0_1px_oklch(0.92_0.01_260/0.25)]" },
+  { key: "B", label: "朱怡欣", dot: "dot-zhu", activeClass: "bg-zhu text-background border-zhu shadow-[0_0_0_1px_oklch(0.55_0.20_250/0.25)]" },
+  { key: "both", label: "双人", dot: "dot-cp", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
 ];
 
 const toMinutes = (t?: string) => {
@@ -35,6 +36,12 @@ const sortByTime = (a: Schedule, b: Schedule) => {
   const diff = a.date.localeCompare(b.date);
   if (diff !== 0) return diff;
   return (toMinutes(a.time) ?? Number.MAX_SAFE_INTEGER) - (toMinutes(b.time) ?? Number.MAX_SAFE_INTEGER);
+};
+
+const scheduleTimeLabel = (item: Schedule) => {
+  if (item.timeMode === "all-day") return "全天";
+  if (item.timeMode === "tbd") return "待定";
+  return item.time ?? "待定";
 };
 
 interface ScheduleClientProps {
@@ -85,27 +92,15 @@ function CalendarGrid({
         const MAX_SHOW = 3;
         const extra = dayItems.length - MAX_SHOW;
         return (
-          <div
+          <button
+            type="button"
             key={dateStr}
-            role="button"
-            tabIndex={hasEvents ? 0 : -1}
+            disabled={!hasEvents}
             aria-label={`${year}年${month}月${day}日${hasEvents ? `，${dayItems.length}项行程` : "，无行程"}`}
+            aria-pressed={isSelected}
             onClick={(e) => {
               if (hasEvents) {
                 createRipple(e);
-                onSelectDate(isSelected ? null : dateStr);
-              }
-            }}
-            onKeyDown={(e) => {
-              if (!hasEvents) return;
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                const rect = e.currentTarget.getBoundingClientRect();
-                createRipple({
-                  currentTarget: e.currentTarget,
-                  clientX: rect.left + rect.width / 2,
-                  clientY: rect.top + rect.height / 2,
-                } as unknown as React.MouseEvent<HTMLElement>);
                 onSelectDate(isSelected ? null : dateStr);
               }
             }}
@@ -131,7 +126,7 @@ function CalendarGrid({
             {/* 移动端只显示圆点指示器，sm 以上显示文字 */}
             <div className="hidden sm:flex sm:flex-col gap-1">
               {dayItems.slice(0, MAX_SHOW).map((s) => (
-                <div key={s.slug} className="flex items-center gap-1 min-w-0" title={`${s.title}${s.time ? ` · ${s.time}` : ""}`}>
+                <div key={s.slug} className="flex items-center gap-1 min-w-0" title={`${s.title} · ${scheduleTimeLabel(s)}`}>
                   <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${getDot(s.member)}`} />
                   <span className="truncate text-[10px] font-mono text-foreground/75 leading-tight">{s.title}</span>
                 </div>
@@ -147,7 +142,7 @@ function CalendarGrid({
                 {dayItems.length > 4 && <span className="text-[8px] text-muted/60 leading-none">+{dayItems.length - 4}</span>}
               </div>
             )}
-          </div>
+          </button>
         );
       })}
     </div>
@@ -161,13 +156,18 @@ function getStatus(item: Schedule, now: Date) {
     return { text: "已结束", cls: "text-muted/50 border-border/50" };
   }
   if (dateStr === todayStr) {
-    return { text: "今日", cls: "text-cp border-cp/50" };
+    const startMinutes = toMinutes(item.time);
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    if (startMinutes !== null && currentMinutes >= startMinutes && currentMinutes <= startMinutes + 180) {
+      return { text: "进行中", cls: "text-rose border-rose/50 bg-rose/10" };
+    }
+    return { text: "今天", cls: "text-cp border-cp/50 bg-cp/10" };
   }
   const diffDays = Math.round(
     (new Date(dateStr + "T00:00:00").getTime() - new Date(todayStr + "T00:00:00").getTime()) / 86400000
   );
   if (diffDays === 1) return { text: "明天", cls: "text-cp border-cp/40" };
-  return { text: `还有 ${diffDays} 天`, cls: "text-cp/80 border-cp/30" };
+  return { text: `还有 ${diffDays} 天`, cls: "text-cp/80 border-cp/30 bg-cp/5" };
 }
 
 export function ScheduleClient({ schedules }: ScheduleClientProps) {
@@ -220,7 +220,7 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
   const months = Object.keys(grouped).sort().reverse();
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="schedule-page flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <MonthFilter
           months={allMonths}
@@ -232,7 +232,7 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
         />
 
         {/* 成员筛选 */}
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div role="group" aria-label="按成员筛选" className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
           {memberOptions.map((opt) => (
             <motion.button
               key={opt.key}
@@ -243,7 +243,8 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                 setSelectedMember(opt.key);
                 setSelectedDate(null);
               }}
-              className={`relative overflow-hidden px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
+                aria-pressed={selectedMember === opt.key}
+                className={`relative overflow-hidden shrink-0 px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
                 selectedMember === opt.key
                   ? opt.activeClass
                   : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground"
@@ -258,7 +259,7 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 w-fit bg-surface/60 border border-border rounded-full p-1">
+          <div role="group" aria-label="切换行程视图" className="flex items-center gap-1.5 w-fit bg-surface/60 border border-border rounded-full p-1">
             {(["list", "calendar"] as const).map((v) => (
               <motion.button
                 key={v}
@@ -268,9 +269,11 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                   createRipple(e);
                   setView(v);
                 }}
+                aria-pressed={view === v}
+                aria-label={v === "list" ? "列表视图" : "月历视图"}
                 className={"relative overflow-hidden px-3.5 py-1 rounded-full text-[10px] font-mono transition-all duration-200 btn-press ripple-container " +
                   (view === v
-                    ? "bg-cp text-background shadow-[0_0_10px_oklch(0.65_0.22_295/0.4)]"
+                    ? "bg-cp text-background shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]"
                     : "text-muted hover:text-foreground")}
               >
                 {v === "list" ? "列表" : "月历"}
@@ -286,7 +289,7 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
               onClick={goToToday}
               className="relative overflow-hidden flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-mono border border-cp/40 bg-cp/10 text-cp hover:bg-cp/20 transition-all btn-press ripple-container"
             >
-              <span>📍</span> 回到今日
+              <MetaIcon name="pin" className="w-3.5 h-3.5" /> 回到今日
             </motion.button>
           )}
         </div>
@@ -304,7 +307,7 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
               </div>
 
               {view === "calendar" ? (
-                <BentoTile className="p-5">
+                <BentoTile className="schedule-calendar p-5">
                   <CalendarGrid
                     year={y}
                     month={m}
@@ -352,10 +355,10 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                                     <span className="text-[10px] font-mono text-cp/80 uppercase tracking-wider">{item.type}</span>
                                   </>
                                 )}
-                                {item.time && <span className="text-[10px] font-mono text-muted ml-auto">⏰ {item.time}</span>}
+                                <span className="text-[10px] font-mono text-muted ml-auto inline-flex items-center gap-1"><MetaIcon name="clock" className="w-3 h-3" />{scheduleTimeLabel(item)}</span>
                               </div>
                               <h4 className="font-serif text-sm font-semibold mb-1">{item.title}</h4>
-                              {item.location && <p className="text-[11px] text-muted font-mono">📍 {item.location}</p>}
+                              {item.location && <p className="text-[11px] text-muted font-mono inline-flex items-center gap-1"><MetaIcon name="pin" className="w-3 h-3 shrink-0" />{item.location}</p>}
                               {item.description && <p className="text-xs text-muted/70 leading-relaxed mt-1">{item.description}</p>}
                             </div>
                           </div>
@@ -365,11 +368,11 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                   )}
                 </BentoTile>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="schedule-list grid grid-cols-1 md:grid-cols-2 gap-3">
                   {grouped[month].map((item) => {
                     const status = getStatus(item, now);
                     return (
-                      <BentoTile key={item.slug} id={item.slug} className="flex-row items-start gap-4">
+                      <BentoTile key={item.slug} id={item.slug} className="schedule-entry flex-row items-start gap-4">
                         <div className="flex flex-col items-center min-w-[3.5rem]">
                           <span className="font-mono text-[10px] text-muted">
                             {formatWeekday(item.date)}
@@ -397,10 +400,10 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                             )}
                           </div>
                           <h3 className="font-serif text-base font-semibold">{item.title}</h3>
-                          {(item.time || item.location) && (
+                          {(item.timeMode || item.time || item.location) && (
                             <p className="text-xs text-muted font-mono flex items-center gap-2 flex-wrap">
-                              {item.time && <span>⏰ {item.time}</span>}
-                              {item.location && <span>📍 {item.location}</span>}
+                              <span className="inline-flex items-center gap-1"><MetaIcon name="clock" className="w-3 h-3" />{scheduleTimeLabel(item)}</span>
+                              {item.location && <span className="inline-flex items-center gap-1"><MetaIcon name="pin" className="w-3 h-3" />{item.location}</span>}
                             </p>
                           )}
                           {item.description && <p className="text-xs text-muted/70 leading-relaxed">{item.description}</p>}

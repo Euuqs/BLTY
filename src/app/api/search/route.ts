@@ -1,6 +1,10 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { sameStyles, schedules, feeds } from "@/lib/velite";
+import {
+  publishedFeeds as feeds,
+  publishedSameStyles as sameStyles,
+  publishedSchedules as schedules,
+} from "@/lib/velite";
 
 interface SearchResult {
   type: "same-style" | "schedule" | "feed";

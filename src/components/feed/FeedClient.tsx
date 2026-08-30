@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useMemo, useState } from "react";
 import { motion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
@@ -8,7 +9,7 @@ import { TypeIcon } from "@/components/ui/TypeIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
 import { ArrowUpRight } from "@/components/mascot/Mascots";
-import { formatDateTime, formatMonth } from "@/lib/date";
+import { formatDateTime, formatMonth, formatDay, formatWeekday } from "@/lib/date";
 import type { Feed } from "@/lib/velite";
 
 const getLabel = (m: string) => m === "A" ? "柏欣妤" : m === "B" ? "朱怡欣" : "双人";
@@ -17,10 +18,10 @@ const getColor = (m: string) => m === "A" ? "text-bai" : m === "B" ? "text-zhu" 
 type MemberFilter = "all" | "A" | "B" | "both";
 
 const memberOptions: { key: MemberFilter; label: string; dot: string; activeClass: string }[] = [
-  { key: "all", label: "全部", dot: "", activeClass: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]" },
-  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-bai text-background border-bai shadow-[0_0_12px_oklch(0.92_0.01_260/0.4)]" },
-  { key: "B", label: "朱怡欣", dot: "dot-zhu", activeClass: "bg-zhu text-background border-zhu shadow-[0_0_12px_oklch(0.55_0.20_250/0.4)]" },
-  { key: "both", label: "双人", dot: "dot-cp", activeClass: "bg-cp text-background border-cp shadow-[0_0_12px_oklch(0.65_0.22_295/0.4)]" },
+  { key: "all", label: "全部", dot: "", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
+  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-bai text-background border-bai shadow-[0_0_0_1px_oklch(0.92_0.01_260/0.25)]" },
+  { key: "B", label: "朱怡欣", dot: "dot-zhu", activeClass: "bg-zhu text-background border-zhu shadow-[0_0_0_1px_oklch(0.55_0.20_250/0.25)]" },
+  { key: "both", label: "双人", dot: "dot-cp", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
 ];
 
 interface FeedClientProps {
@@ -53,7 +54,17 @@ export function FeedClient({ feeds }: FeedClientProps) {
   }), [filtered]);
 
   return (
-    <div className="flex flex-col gap-6 sm:gap-8">
+    <div className="feed-page feed-timeline flex flex-col gap-6 sm:gap-8 relative">
+      <div className="absolute top-0 right-0 w-24 h-24 opacity-15 pointer-events-none hidden md:block">
+        <Image
+          src="/static/mascots/casual-theater.jpg"
+          alt=""
+          fill
+          sizes="96px"
+          loading="lazy"
+          className="object-cover rounded-full"
+        />
+      </div>
       <MonthFilter
         months={allMonths}
         selectedMonth={selectedMonth}
@@ -61,7 +72,7 @@ export function FeedClient({ feeds }: FeedClientProps) {
       />
 
       {/* 成员筛选 */}
-      <div className="flex flex-wrap items-center gap-1.5">
+      <div role="group" aria-label="按成员筛选" className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
         {memberOptions.map((opt) => (
           <motion.button
             key={opt.key}
@@ -71,11 +82,12 @@ export function FeedClient({ feeds }: FeedClientProps) {
               createRipple(e);
               setSelectedMember(opt.key);
             }}
-            className={`relative overflow-hidden px-3 sm:px-3.5 py-2 sm:py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
+            className={`relative overflow-hidden shrink-0 px-3 sm:px-3.5 py-2 sm:py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
               selectedMember === opt.key
                 ? opt.activeClass
                 : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground"
             }`}
+            aria-pressed={selectedMember === opt.key}
           >
             <span className="flex items-center gap-1.5">
               {opt.dot && <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />}
@@ -109,14 +121,18 @@ export function FeedClient({ feeds }: FeedClientProps) {
         <div className="flex flex-col gap-4 sm:gap-5">
           {sorted.map((item, idx) => {
             const month = formatMonth(item.date);
-            const prevMonth = idx > 0 ? formatMonth(sorted[idx - 1].date) : null;
-            const isNewMonth = month !== prevMonth;
+            const date = item.date.slice(0, 10);
+            const prevDate = idx > 0 ? sorted[idx - 1].date.slice(0, 10) : null;
+            const isNewDate = date !== prevDate;
             return (
               <div key={item.slug} id={item.slug}>
-                {isNewMonth && (
-                  <div className="flex items-center gap-3 mb-3 sm:mb-4">
-                    <span className="font-mono text-[10px] tracking-wider text-cp px-3 py-1 rounded-full bg-background border border-cp/20">
-                      {month}
+                {isNewDate && (
+                  <div className="flex items-baseline gap-3 mb-3 sm:mb-4 pl-10 sm:pl-12">
+                    <span className="font-serif text-2xl sm:text-3xl font-semibold text-foreground tabular-nums">
+                      {formatDay(item.date)}
+                    </span>
+                    <span className="font-mono text-[10px] tracking-wider text-cp">
+                      {month} · {formatWeekday(item.date)}
                     </span>
                     <div className="flex-1 h-px bg-border" />
                   </div>

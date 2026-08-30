@@ -20,7 +20,7 @@ export function ThemeToggle() {
       whileHover={{ scale: 1.1, rotate: 15 }}
       whileTap={{ scale: 0.9 }}
       onClick={handleClick}
-      className="relative w-9 h-9 rounded-lg bg-surface/50 border border-border flex items-center justify-center text-muted hover:text-cp transition-colors btn-press overflow-hidden"
+      className="relative w-11 h-11 lg:w-9 lg:h-9 rounded-lg bg-surface/50 border border-border flex items-center justify-center text-muted hover:text-cp transition-colors btn-press overflow-hidden"
       aria-label={theme === "dark" ? "切换到浅色模式" : "切换到深色模式"}
     >
       <AnimatePresence mode="wait">

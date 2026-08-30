@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { motion } from "motion/react";
 import { DogMascot, PigMascot } from "@/components/mascot/Mascots";
@@ -45,24 +46,40 @@ export function EmptyState({ message, hint, member = "both" }: EmptyStateProps) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col items-center justify-center gap-4 py-16 text-center"
+      className="flex flex-col items-center justify-center gap-4 py-16 text-center relative"
     >
-      <div className="flex items-center">
+      <div className="relative w-32 h-32 sm:w-40 sm:h-40 mb-2">
+        <div className="absolute inset-0 rounded-full bg-cp/10 blur-xl scale-110" />
+        <motion.div
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="relative w-full h-full rounded-full overflow-hidden border-2 border-cp/30 shadow-[0_0_32px_oklch(0.65_0.22_295/0.25)]"
+        >
+          <Image
+            src="/static/mascots/bai-rabbit.jpg"
+            alt="柏里挑怡"
+            fill
+            sizes="(max-width: 640px) 128px, 160px"
+            className="object-cover"
+          />
+        </motion.div>
+      </div>
+      <div className="flex items-center justify-center gap-0 -mt-2">
         <motion.div
           whileHover={{ scale: 1.1, rotate: -10 }}
           whileTap={{ scale: 0.9 }}
           onClick={(e) => handleMascotClick(e, "sparkles")}
           className={`cursor-pointer transition-opacity ${member === "B" ? "opacity-20" : "opacity-70 hover:opacity-100"}`}
         >
-          <DogMascot className="mascot-float w-16 h-16" />
+          <DogMascot className="w-10 h-10" />
         </motion.div>
         <motion.div
           whileHover={{ scale: 1.1, rotate: 10 }}
           whileTap={{ scale: 0.9 }}
           onClick={(e) => handleMascotClick(e, "hearts")}
-          className={`-ml-3 cursor-pointer transition-opacity ${member === "A" ? "opacity-20" : "opacity-70 hover:opacity-100"}`}
+          className={`cursor-pointer transition-opacity ${member === "A" ? "opacity-20" : "opacity-70 hover:opacity-100"}`}
         >
-          <PigMascot className="mascot-float mascot-float-delayed w-16 h-16" />
+          <PigMascot className="w-10 h-10" />
         </motion.div>
       </div>
       <div className="flex flex-col gap-1.5">

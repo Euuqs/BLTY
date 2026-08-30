@@ -1,0 +1,53 @@
+{
+  "legacy-same-style.mdx": {
+    "valid": true,
+    "collection": "same-styles",
+    "effectiveStatus": "published",
+    "effectiveIdPrefix": "legacy:same-styles:",
+    "publishable": false
+  },
+  "legacy-schedule-specific.mdx": {
+    "valid": true,
+    "collection": "schedules",
+    "effectiveStatus": "published",
+    "effectiveTimeMode": "specific"
+  },
+  "legacy-schedule-tbd.mdx": {
+    "valid": true,
+    "collection": "schedules",
+    "effectiveStatus": "published",
+    "effectiveTimeMode": "tbd",
+    "preserveFields": ["legacySource"]
+  },
+  "legacy-feed-special-chars.mdx": {
+    "valid": true,
+    "collection": "feeds",
+    "effectiveStatus": "published",
+    "preserveFields": ["legacySource"],
+    "preserveBody": true
+  },
+  "new-same-style-draft.mdx": {
+    "valid": true,
+    "collection": "same-styles",
+    "effectiveStatus": "draft",
+    "publishable": false
+  },
+  "new-schedule-all-day.mdx": {
+    "valid": true,
+    "collection": "schedules",
+    "effectiveStatus": "published",
+    "effectiveTimeMode": "all-day",
+    "publishable": true
+  },
+  "new-feed-published.mdx": {
+    "valid": true,
+    "collection": "feeds",
+    "effectiveStatus": "published",
+    "sourcePlatform": "抖音",
+    "publishable": true
+  },
+  "invalid-content.mdx": {
+    "valid": false,
+    "errors": ["date", "member", "link"]
+  }
+}
