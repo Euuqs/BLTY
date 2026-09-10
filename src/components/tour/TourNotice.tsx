@@ -65,15 +65,15 @@ export function TourNotice() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2 py-0.5 rounded-full bg-cp/20 border border-cp/40 text-[9px] font-mono text-cp tracking-widest">
-                  TOUR 2026
+                  STAGE ARCHIVE
                 </span>
                 <span className="font-mono text-[10px] text-muted">08.22 杭州站</span>
               </div>
-              <p className="text-sm font-medium mt-0.5" title="PRIVATE SIGNAL 巡演攻略已上线 · 痛楼 · 大屏 · 场外应援全汇总">
-                <span className="sm:hidden">攻略已上线</span>
+              <p className="text-sm font-medium mt-0.5" title="PRIVATE SIGNAL 杭州站舞台档案已上线">
+                <span className="sm:hidden">舞台档案已上线</span>
                 <span className="hidden sm:inline">
-                  PRIVATE SIGNAL 巡演攻略已上线
-                  <span className="text-muted font-normal ml-2">痛楼 · 大屏 · 场外应援全汇总</span>
+                  PRIVATE SIGNAL 杭州站演出回顾
+                  <span className="text-muted font-normal ml-2">全场 Focus · 精选舞台 · 当日记忆</span>
                 </span>
               </p>
             </div>
@@ -84,7 +84,7 @@ export function TourNotice() {
                 onClick={handleNav}
                 className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-cp to-[oklch(0.55_0.22_340)] text-white text-xs font-medium btn-press shadow-[0_0_16px_oklch(0.65_0.22_295/0.3)] ripple-container"
               >
-                查看攻略
+                查看回顾
                 <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
               </Link>
               <motion.button

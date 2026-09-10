@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 type MetaIconName =
   | "lightbulb" | "pin" | "clock" | "calendar" | "ticket" | "stadium"
   | "screen" | "wall" | "flower" | "flag" | "camera" | "sign" | "metro"
-  | "car" | "bus" | "walk" | "microphone" | "sparkles" | "clipboard" | "balloon";
+  | "car" | "bus" | "walk" | "microphone" | "sparkles" | "clipboard" | "balloon" | "search";
 
 const paths: Record<MetaIconName, ReactNode> = {
   lightbulb: <><path d="M9 18h6" /><path d="M10 21h4" /><path d="M8.2 14.8A6 6 0 1 1 15.8 14.8c-.9.8-1.4 1.7-1.6 3.2h-4.4c-.2-1.5-.7-2.4-1.6-3.2Z" /></>,
@@ -26,6 +26,7 @@ const paths: Record<MetaIconName, ReactNode> = {
   sparkles: <><path d="m12 3 1.6 5.4L19 10l-5.4 1.6L12 17l-1.6-5.4L5 10l5.4-1.6L12 3Z" /><path d="m19 15 .7 2.3L22 18l-2.3.7L19 21l-.7-2.3L16 18l2.3-.7L19 15Z" /></>,
   clipboard: <><rect x="5" y="4" width="14" height="17" rx="2" /><path d="M9 4.5V3h6v1.5M8 9h8M8 13h8M8 17h5" /></>,
   balloon: <><path d="M12 3c-3.5 0-5.5 2.8-5.5 6 0 3.2 2.3 5.5 5.5 5.5s5.5-2.3 5.5-5.5c0-3.2-2-6-5.5-6Z" /><path d="M12 14.5v3M10.5 21h3M12 17.5l-1.5 3.5" /></>,
+  search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
 };
 
 export function MetaIcon({ name, className = "" }: { name: string; className?: string }) {

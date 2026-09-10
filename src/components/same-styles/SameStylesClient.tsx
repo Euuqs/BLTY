@@ -300,6 +300,8 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
         item={
           detailItem
             ? {
+                id: detailItem.id,
+                slug: detailItem.slug,
                 title: detailItem.title,
                 brand: detailItem.brand,
                 category: detailItem.category,
@@ -312,6 +314,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
               }
             : null
         }
+        contextType="same-style"
         onClose={() => setDetailItem(null)}
         onImageClick={(src) => {
           const idx = coversWithImages.findIndex((s) => s.cover === src);

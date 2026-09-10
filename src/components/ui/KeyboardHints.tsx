@@ -49,7 +49,7 @@ export function KeyboardHints() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
         onClick={() => setShowHelp(true)}
-        className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-40 group flex min-h-11 min-w-11 items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface/60 backdrop-blur border border-border/40 hover:border-cp/30 hover:bg-surface/80 transition-all text-[10px] font-mono text-muted hover:text-foreground"
+        className="floating-control floating-control-left floating-control-secondary group flex min-h-11 min-w-11 items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-surface/60 backdrop-blur border border-border/40 hover:border-cp/30 hover:bg-surface/80 transition-all text-[10px] font-mono text-muted hover:text-foreground"
         aria-label="键盘快捷键帮助"
       >
         <span className="opacity-60 group-hover:opacity-100 transition-opacity">⌨</span>

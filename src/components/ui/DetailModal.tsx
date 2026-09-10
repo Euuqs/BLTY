@@ -7,8 +7,11 @@ import { useFeedback } from "./FeedbackProvider";
 import { MdxRenderer } from "./MdxRenderer";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import { ArrowUpRight } from "@/components/mascot/Mascots";
+import { useCompanion } from "@/components/companion/CompanionProvider";
 
 interface DetailItem {
+  id?: string;
+  slug?: string;
   title: string;
   brand?: string;
   category?: string;
@@ -26,10 +29,12 @@ interface DetailModalProps {
   item: DetailItem | null;
   onClose: () => void;
   onImageClick?: (src: string) => void;
+  contextType?: "same-style" | "schedule" | "feed";
 }
 
-export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
+export function DetailModal({ item, onClose, onImageClick, contextType }: DetailModalProps) {
   const { spawnParticles, createRipple } = useFeedback();
+  const { setPageContext } = useCompanion();
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, !!item);
 
@@ -44,6 +49,17 @@ export function DetailModal({ item, onClose, onImageClick }: DetailModalProps) {
       };
     }
   }, [item, onClose]);
+
+  useEffect(() => {
+    if (!item || !contextType) return;
+    setPageContext({
+      pageType: contextType,
+      contentId: item.id ?? item.slug,
+      title: item.title,
+      date: item.date,
+    });
+    return () => setPageContext(undefined);
+  }, [contextType, item, setPageContext]);
 
   const memberLabel = item?.member === "A" ? "柏欣妤" : item?.member === "B" ? "朱怡欣" : "双人";
   const memberColor = item?.member === "A" ? "text-bai" : item?.member === "B" ? "text-zhu" : "text-cp";

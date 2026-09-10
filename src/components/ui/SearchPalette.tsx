@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useFeedback } from "./FeedbackProvider";
 import { useFocusTrap } from "@/lib/useFocusTrap";
 import { ArrowUpRight } from "@/components/mascot/Mascots";
+import { MetaIcon } from "./MetaIcon";
 
 type SearchResult = {
   type: "same-style" | "schedule" | "feed";
@@ -114,14 +115,11 @@ export function SearchPalette() {
           setActiveIndex(0);
           setOpen(true);
         }}
-        className="flex min-h-11 min-w-11 sm:min-h-9 items-center justify-center gap-2 px-3 py-1.5 rounded-lg bg-surface/50 border border-border text-muted text-xs font-mono hover:border-cp/40 hover:text-foreground transition-all btn-press"
+        className="editorial-search flex min-h-11 min-w-11 items-center justify-center gap-2 px-3 py-1.5 text-muted text-xs hover:text-foreground transition-all btn-press"
         aria-label="打开全站搜索"
       >
-        <span>{"\u{1F50D}"}</span>
-        <span className="hidden sm:inline">搜索</span>
-        <kbd className="hidden md:inline px-1.5 py-0.5 rounded bg-surface-2 text-[10px] border border-border">
-          Ctrl K
-        </kbd>
+        <MetaIcon name="search" className="h-5 w-5" />
+        <span className="hidden xl:inline">搜索你想看的内容…</span>
       </motion.button>
 
       <AnimatePresence>
@@ -143,7 +141,7 @@ export function SearchPalette() {
               className="w-full max-w-xl bento-tile p-0 overflow-hidden"
             >
               <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-                <span className="text-muted">{"\u{1F50D}"}</span>
+                <MetaIcon name="search" className="h-5 w-5 text-muted" />
                 <input
                   ref={inputRef}
                   value={query}

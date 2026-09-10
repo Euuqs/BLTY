@@ -132,7 +132,7 @@ export function FeedbackModal() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 20 }}
         onClick={handleOpen}
-        className="fixed bottom-6 left-4 md:bottom-8 md:left-8 z-[60] group btn-press"
+        className="floating-control floating-control-left floating-control-primary group btn-press"
         aria-label="提意见"
         title="提意见"
         style={{ pointerEvents: "auto" }}

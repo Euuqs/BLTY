@@ -113,6 +113,63 @@ export default defineConfig({
           slug: data.slug ?? slugify(data.title, data.date),
         })),
     },
+    stories: {
+      name: "Story",
+      pattern: "companion/stories/**/*.mdx",
+      schema: s
+        .object({
+          id: s.string(),
+          slug: s.string().optional(),
+          status: s.enum(["draft", "published"]).optional(),
+          updatedAt: s.string().datetime({ offset: true }).optional(),
+          publishedAt: s.string().datetime({ offset: true }).optional(),
+          title: s.string().max(99),
+          date: s.isodate(),
+          member: s.enum(["A", "B", "both"]),
+          era: s.string(),
+          arc: s.string().optional(),
+          types: s.array(
+            s.enum(["event", "interaction", "timeline", "milestone", "performance", "daily"]),
+          ),
+          tags: s.array(s.string()).optional(),
+          moods: s.array(s.string()).optional(),
+          summary: s.string(),
+          facts: s.array(s.string()),
+          interpretation: s.string().optional(),
+          meaning: s.string().optional(),
+          related: s
+            .array(
+              s.object({
+                type: s.enum(["story", "same-style", "schedule", "feed"]),
+                id: s.string(),
+              }),
+            )
+            .optional(),
+          sources: s
+            .array(
+              s.object({
+                title: s.string(),
+                url: s.string().url(),
+              }),
+            )
+            .optional(),
+          confidence: s.enum(["confirmed", "partial", "unverified"]),
+          body: s.mdx(),
+        })
+        .transform((data) => {
+          const { body, ...rest } = data;
+          return {
+            ...rest,
+            status: data.status ?? "published",
+            slug: data.slug ?? slugify(data.title, data.date),
+            tags: data.tags ?? [],
+            moods: data.moods ?? [],
+            related: data.related ?? [],
+            sources: data.sources ?? [],
+            html: mdxToHtml(body),
+          };
+        }),
+    },
   },
   markdown: {
     remarkPlugins: [remarkGfm],

@@ -55,7 +55,7 @@ export function BackToTop() {
           exit={{ opacity: 0, scale: 0, y: 20 }}
           transition={{ type: "spring", stiffness: 400, damping: 20 }}
           onClick={handleClick}
-          className="fixed bottom-20 right-4 md:bottom-8 md:right-8 z-[60] group btn-press"
+          className="floating-control floating-control-right floating-control-secondary group btn-press"
           aria-label="回到顶部"
         >
           <div className="relative">

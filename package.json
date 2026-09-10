@@ -7,6 +7,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "eslint",
+        "test:companion": "node -e \"require('node:fs').rmSync('.companion-tests',{recursive:true,force:true})\" && tsc -p tsconfig.companion-tests.json && node --test .companion-tests/tests/companion/*.test.js",
         "velite": "velite",
         "prebuild": "velite",
         "predev": "velite"

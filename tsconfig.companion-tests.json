@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "incremental": false,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "target": "ES2022",
+    "outDir": ".companion-tests",
+    "types": ["node"]
+  },
+  "include": [
+    "src/lib/ai/**/*.ts",
+    "src/lib/companion/**/*.ts",
+    "tests/companion/**/*.ts"
+  ]
+}

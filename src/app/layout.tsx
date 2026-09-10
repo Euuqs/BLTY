@@ -20,11 +20,12 @@ import { PageTransition } from "@/components/ui/PageTransition";
 import { KeyboardHints } from "@/components/ui/KeyboardHints";
 import { ReadingIndicator } from "@/components/ui/ReadingIndicator";
 import { NowProvider } from "@/lib/useNow";
+import { CompanionProvider } from "@/components/companion/CompanionProvider";
 
 const initialTimestamp = Date.now();
 
 export const viewport: Viewport = {
-  themeColor: "#120d20",
+  themeColor: "#f7f9fd",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -79,7 +80,7 @@ export default function RootLayout({
     <html lang="zh-CN" className="h-full" suppressHydrationWarning>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
-          {`try{var t=localStorage.getItem("cp-theme");document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f6f4fb":"#120d20"}catch(e){}`}
+          {`try{var t=localStorage.getItem("cp-theme")||"light";document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f7f9fd":"#120d20"}catch(e){}`}
         </Script>
       </head>
       <body className="min-h-full flex flex-col font-sans">
@@ -94,6 +95,7 @@ export default function RootLayout({
             <SoundProvider>
               <MotionConfig reducedMotion="user">
                 <FeedbackProvider>
+                  <CompanionProvider>
                   <div className="cp-atmosphere" />
                   <div className="cp-stars" />
                   <div className="cp-noise" />
@@ -117,6 +119,7 @@ export default function RootLayout({
                   <FeedbackModal />
                   <EasterEggs />
                   <KeyboardHints />
+                  </CompanionProvider>
                 </FeedbackProvider>
               </MotionConfig>
             </SoundProvider>

@@ -55,6 +55,9 @@ docs/             # 设计/功能计划文档
 
 推送到 GitHub 后由 Vercel 自动部署；`/api/search` 依赖 `nodejs` runtime。
 
+AI 故事陪伴者的 mock/DeepSeek 环境变量、Node Runtime、SSE、限流和上线检查见
+[AI 故事陪伴者部署配置](docs/ai-companion-deployment.md)。仓库提供 `.env.example`，真实 `.env.local` 与 API Key 不应提交。
+
 ### 意见箱环境变量
 
 意见箱（`/api/feedback`）把访客意见写入 GitHub Issues，需在 Vercel 配置：

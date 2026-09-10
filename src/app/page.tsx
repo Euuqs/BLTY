@@ -70,7 +70,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col gap-8 lg:gap-10">
+    <div className="home-page flex flex-col gap-8 lg:gap-10">
       <SectionIndicator sections={navSections} />
       <div id="hero" className="scroll-target">
         <HomeHero
@@ -84,21 +84,21 @@ export default function Home() {
       </div>
 
       {/* ===== 生日倒计时 ===== */}
-      <div id="countdown" className="scroll-target">
+      <div id="countdown" className="scroll-target home-content-section">
         <Reveal>
           <BirthdayCountdown />
         </Reveal>
       </div>
 
       {/* ===== 巡演宣传 ===== */}
-      <div id="tour" className="scroll-target">
+      <div id="tour" className="scroll-target home-content-section">
         <Reveal delay={0.05}>
           <TourHighlight />
         </Reveal>
       </div>
 
       {/* ===== 数据洞察 + 标签云 ===== */}
-      <div id="insights" className="scroll-target">
+      <div id="insights" className="scroll-target home-content-section">
         <Reveal delay={0.05}>
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <StatsCharts />
@@ -108,7 +108,7 @@ export default function Home() {
       </div>
 
       {/* ===== 成员档案 · 萌宠标志 ===== */}
-      <div id="profile" className="scroll-target">
+      <div id="profile" className="scroll-target home-content-section">
         <Reveal delay={0.05}>
           <section>
           <div className="flex items-center gap-3 mb-4">
@@ -201,7 +201,7 @@ export default function Home() {
       </div>
 
       {/* ===== 社交账号 ===== */}
-      <div id="social" className="scroll-target">
+      <div id="social" className="scroll-target home-content-section">
       <Reveal delay={0.05}>
         <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {(["bai", "zhu"] as const).map((member) => {
@@ -260,7 +260,7 @@ export default function Home() {
       </div>
 
       {/* ===== 首页导流 ===== */}
-      <div id="guide" className="scroll-target">
+      <div id="guide" className="scroll-target home-content-section">
       <Reveal delay={0.05}>
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <BentoTile className="col-span-1" interactive>
@@ -322,7 +322,7 @@ export default function Home() {
       </div>
 
       {/* ===== 加入应援 · 社区 CTA ===== */}
-      <div id="join" className="scroll-target">
+      <div id="join" className="scroll-target home-content-section">
       <Reveal delay={0.05}>
         <section className="gradient-border relative overflow-hidden rounded-2xl border border-rose/30 bg-gradient-to-br from-rose/15 via-surface to-surface px-6 py-8 md:px-10 md:py-10">
           <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-rose/10 blur-3xl pointer-events-none" />
