@@ -62,7 +62,7 @@ export function DetailModal({ item, onClose, onImageClick, contextType }: Detail
   }, [contextType, item, setPageContext]);
 
   const memberLabel = item?.member === "A" ? "柏欣妤" : item?.member === "B" ? "朱怡欣" : "双人";
-  const memberColor = item?.member === "A" ? "text-bai" : item?.member === "B" ? "text-zhu" : "text-cp";
+  const memberColor = item?.member === "A" ? "text-bai-ink" : item?.member === "B" ? "text-zhu" : "text-cp";
 
   return (
     <AnimatePresence>

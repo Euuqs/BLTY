@@ -4,10 +4,11 @@ import {
   publishedFeeds as feeds,
   publishedSameStyles as sameStyles,
   publishedSchedules as schedules,
+  publishedStories as stories,
 } from "@/lib/velite";
 
 interface SearchResult {
-  type: "same-style" | "schedule" | "feed";
+  type: "story" | "same-style" | "schedule" | "feed";
   title: string;
   subtitle?: string;
   href: string;
@@ -23,6 +24,23 @@ export async function GET(request: NextRequest) {
   if (!q) return NextResponse.json([] as SearchResult[]);
 
   const results: SearchResult[] = [];
+
+  stories.forEach((story) => {
+    const searchable = [story.date, story.date.replaceAll("-", "."), story.title, story.summary, story.arc, ...story.tags, ...story.facts]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    if (searchable.includes(q)) {
+      results.push({
+        type: "story",
+        title: story.title,
+        subtitle: `${story.date.slice(0, 10)} · ${story.arc ?? "故事档案"}`,
+        href: `/stories/${story.slug}`,
+        slug: story.slug,
+        member: story.member,
+      });
+    }
+  });
 
   sameStyles.forEach((s) => {
     if (

@@ -11,6 +11,7 @@ export const COMPANION_LIMITS = {
   pageTitleCharacters: 120,
   anonymousSessionIdCharacters: 128,
   recommendations: 2,
+  discoveredMemories: 8,
   requestTimeoutMs: 30_000,
 } as const;
 
@@ -82,6 +83,21 @@ function parsePageContext(value: unknown): CompanionPageContext | undefined {
   };
 }
 
+function parseDiscoveredMemories(value: unknown) {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value) || value.length > COMPANION_LIMITS.discoveredMemories) {
+    throw new Error("discoveredMemories is invalid");
+  }
+  return value.map((item, index) => {
+    if (!isRecord(item)) throw new Error(`discoveredMemories[${index}] is invalid`);
+    const id = readOptionalString(item.id, `discoveredMemories[${index}].id`, 80);
+    const title = readOptionalString(item.title, `discoveredMemories[${index}].title`, 80);
+    const excerpt = readOptionalString(item.excerpt, `discoveredMemories[${index}].excerpt`, 160);
+    if (!id || !title || !excerpt) throw new Error(`discoveredMemories[${index}] is invalid`);
+    return { id, title, excerpt };
+  });
+}
+
 export function parseCompanionChatRequest(value: unknown): CompanionChatRequest {
   if (!isRecord(value)) throw new Error("request body must be an object");
 
@@ -101,6 +117,7 @@ export function parseCompanionChatRequest(value: unknown): CompanionChatRequest 
     conversation = value.conversation.map(parseMessage);
   }
 
+  const discoveredMemories = parseDiscoveredMemories(value.discoveredMemories);
   return {
     message,
     conversation,
@@ -110,6 +127,6 @@ export function parseCompanionChatRequest(value: unknown): CompanionChatRequest 
       "anonymousSessionId",
       COMPANION_LIMITS.anonymousSessionIdCharacters,
     ),
+    ...(discoveredMemories ? { discoveredMemories } : {}),
   };
 }
-

@@ -150,6 +150,15 @@ export default defineConfig({
               s.object({
                 title: s.string(),
                 url: s.string().url(),
+                kind: s.enum(["self", "official", "full-recording", "fan-archive", "search-index"]).optional(),
+                checkedAt: s.isodate().optional(),
+                availability: s.enum(["available", "unknown", "unavailable"]).optional(),
+                backup: s
+                  .object({
+                    title: s.string(),
+                    url: s.string().url(),
+                  })
+                  .optional(),
               }),
             )
             .optional(),

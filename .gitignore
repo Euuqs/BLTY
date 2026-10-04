@@ -49,5 +49,8 @@ next-env.d.ts
 
 # tool directories
 /.agents/
+/.codex/
+/.skills/
+/tmp/
 .omo/
 .opencode/

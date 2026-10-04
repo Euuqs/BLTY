@@ -34,7 +34,11 @@ export function FeedbackModal() {
   }, [cooldownUntil]);
 
   useEffect(() => {
-    const handler = () => setOpen(true);
+    const handler = (event: Event) => {
+      const prefill = (event as CustomEvent<{ prefill?: string }>).detail?.prefill;
+      if (prefill) setContent(prefill.slice(0, MAX_CONTENT));
+      setOpen(true);
+    };
     window.addEventListener("open-feedback", handler);
     return () => window.removeEventListener("open-feedback", handler);
   }, []);

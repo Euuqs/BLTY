@@ -34,6 +34,13 @@ export interface CompanionChatRequest {
   conversation?: CompanionMessage[];
   pageContext?: CompanionPageContext;
   anonymousSessionId?: string;
+  discoveredMemories?: CompanionDiscoveredMemory[];
+}
+
+export interface CompanionDiscoveredMemory {
+  id: string;
+  title: string;
+  excerpt: string;
 }
 
 export interface CompanionRecommendation {
@@ -71,4 +78,3 @@ export interface CompanionLocalMemory {
   seenRecommendationIds: string[];
   preferences: Record<string, string>;
 }
-

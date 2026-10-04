@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
 import { MonthFilter } from "@/components/ui/MonthFilter";
 import { TypeIcon } from "@/components/ui/TypeIcon";
@@ -14,13 +14,13 @@ import type { Schedule } from "@/lib/velite";
 
 const getDot = (m: string) => m === "A" ? "dot-bai" : m === "B" ? "dot-zhu" : "dot-cp";
 const getLabel = (m: string) => m === "A" ? "柏欣妤" : m === "B" ? "朱怡欣" : "双人";
-const getColor = (m: string) => m === "A" ? "text-bai" : m === "B" ? "text-zhu" : "text-gradient-cp";
+const getColor = (m: string) => m === "A" ? "text-bai-ink" : m === "B" ? "text-zhu" : "text-gradient-cp";
 
 type MemberFilter = "all" | "A" | "B" | "both";
 
 const memberOptions: { key: MemberFilter; label: string; dot: string; activeClass: string }[] = [
   { key: "all", label: "全部", dot: "", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
-  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-bai text-background border-bai shadow-[0_0_0_1px_oklch(0.92_0.01_260/0.25)]" },
+  { key: "A", label: "柏欣妤", dot: "dot-bai", activeClass: "bg-surface text-bai-ink border-bai-ink" },
   { key: "B", label: "朱怡欣", dot: "dot-zhu", activeClass: "bg-zhu text-background border-zhu shadow-[0_0_0_1px_oklch(0.55_0.20_250/0.25)]" },
   { key: "both", label: "双人", dot: "dot-cp", activeClass: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]" },
 ];
@@ -171,6 +171,7 @@ function getStatus(item: Schedule, now: Date) {
 }
 
 export function ScheduleClient({ schedules }: ScheduleClientProps) {
+  const reduceMotion = useReducedMotion() === true;
   const allMonths = [...new Set(schedules.map(s => formatMonth(s.date)))].sort().reverse();
   const [selectedMonth, setSelectedMonth] = useState<string | null>(null);
   const [selectedMember, setSelectedMember] = useState<MemberFilter>("all");
@@ -234,17 +235,15 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
         {/* 成员筛选 */}
         <div role="group" aria-label="按成员筛选" className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
           {memberOptions.map((opt) => (
-            <motion.button
+            <button
               key={opt.key}
-              whileHover={{ scale: 1.05, y: -1 }}
-              whileTap={{ scale: 0.95 }}
               onClick={(e) => {
                 createRipple(e);
                 setSelectedMember(opt.key);
                 setSelectedDate(null);
               }}
                 aria-pressed={selectedMember === opt.key}
-                className={`relative overflow-hidden shrink-0 px-3.5 py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
+                className={`schedule-filter relative overflow-hidden shrink-0 px-3.5 py-1.5 text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container ${
                 selectedMember === opt.key
                   ? opt.activeClass
                   : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground"
@@ -254,38 +253,34 @@ export function ScheduleClient({ schedules }: ScheduleClientProps) {
                 {opt.dot && <span className={`w-1.5 h-1.5 rounded-full ${opt.dot}`} />}
                 {opt.label}
               </span>
-            </motion.button>
+            </button>
           ))}
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
           <div role="group" aria-label="切换行程视图" className="flex items-center gap-1.5 w-fit bg-surface/60 border border-border rounded-full p-1">
             {(["list", "calendar"] as const).map((v) => (
-              <motion.button
+              <button
                 key={v}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={(e) => {
                   createRipple(e);
                   setView(v);
                 }}
                 aria-pressed={view === v}
                 aria-label={v === "list" ? "列表视图" : "月历视图"}
-                className={"relative overflow-hidden px-3.5 py-1 rounded-full text-[10px] font-mono transition-all duration-200 btn-press ripple-container " +
+                className={"schedule-view-button relative overflow-hidden px-3.5 py-1 text-[10px] font-mono transition-all duration-200 btn-press ripple-container " +
                   (view === v
                     ? "bg-cp text-background shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]"
                     : "text-muted hover:text-foreground")}
               >
                 {v === "list" ? "列表" : "月历"}
-              </motion.button>
+              </button>
             ))}
           </div>
           {!isCurrentMonth && (
             <motion.button
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
               onClick={goToToday}
               className="relative overflow-hidden flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[10px] font-mono border border-cp/40 bg-cp/10 text-cp hover:bg-cp/20 transition-all btn-press ripple-container"
             >

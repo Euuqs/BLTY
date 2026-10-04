@@ -1,5 +1,6 @@
 import type {
   CompanionMessage,
+  CompanionDiscoveredMemory,
   CompanionPageContext,
   CompanionRecommendation,
   CompanionUsage,
@@ -22,6 +23,7 @@ export interface CompanionProviderInput {
   pageContext?: CompanionPageContext;
   intent: CompanionIntent;
   storyMatches: StorySearchResult<ProviderStory>[];
+  discoveredMemories?: CompanionDiscoveredMemory[];
 }
 
 export type CompanionProviderEvent =

@@ -30,7 +30,11 @@ function buildContext(input: CompanionProviderInput): string {
   const page = input.pageContext
     ? `当前页面：${JSON.stringify(input.pageContext)}`
     : "当前页面：无特定内容上下文";
-  if (input.intent.mode !== "story") return page;
+  const discoveredMemories = input.discoveredMemories ?? [];
+  const memories = discoveredMemories.length
+    ? `用户在本站亲自发现的彩蛋（仅是浏览器内的阅读记录，不是当事人的私人记忆）：${JSON.stringify(discoveredMemories)}`
+    : "用户尚未在本站发现彩蛋。";
+  if (input.intent.mode !== "story") return `${page}\n${memories}`;
 
   const stories = input.storyMatches.map(({ story }) => ({
     id: story.id,
@@ -44,7 +48,7 @@ function buildContext(input: CompanionProviderInput): string {
     confidence: story.confidence,
     sources: input.intent.wantsSources ? story.sources : undefined,
   }));
-  return `${page}\n站内候选资料：${stories.length ? JSON.stringify(stories) : "没有匹配资料"}`;
+  return `${page}\n${memories}\n站内候选资料：${stories.length ? JSON.stringify(stories) : "没有匹配资料"}`;
 }
 
 async function* parseOpenAIStream(
