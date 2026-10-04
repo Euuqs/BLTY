@@ -28,7 +28,7 @@ interface FeedbackContextType {
 
 const FeedbackContext = createContext<FeedbackContextType | null>(null);
 
-const HEART_COLORS = ["text-rose", "text-cp", "text-zhu", "text-bai"];
+const HEART_COLORS = ["text-rose", "text-cp", "text-zhu", "text-bai-ink"];
 const SPARKLE_COLORS = ["text-white", "text-rose", "text-cp"];
 const CONFETTI_COLORS = [
   "oklch(0.65 0.22 295)",

@@ -5,6 +5,11 @@ import type {
 } from "../provider";
 
 function replyFor(input: CompanionProviderInput): string {
+  const discoveredMemories = input.discoveredMemories ?? [];
+  if (/彩蛋|记得|纸条/.test(input.message) && discoveredMemories.length > 0) {
+    const latest = discoveredMemories.at(-1)!;
+    return `记得。你在档案里发现过 ${discoveredMemories.length} 张小纸条，最近一张写着“${latest.excerpt}”。这些只是保存在这台浏览器里的阅读记忆。`;
+  }
   if (input.intent.mode === "story") {
     const match = input.storyMatches[0]?.story;
     if (!match) {

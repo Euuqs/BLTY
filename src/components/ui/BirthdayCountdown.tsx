@@ -14,7 +14,7 @@ const BIRTHDAYS = [
     day: 25,
     icon: DogMascot,
     dot: "dot-bai",
-    text: "text-bai",
+    text: "text-bai-ink",
     glow: "from-bai/20",
     border: "hover:border-bai/40",
     emoji: "\u{1F436}",

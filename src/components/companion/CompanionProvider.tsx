@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { streamCompanionChat } from "@/lib/companion/client";
 import type { CompanionMessage, CompanionPageContext, CompanionRecommendation } from "@/lib/companion/types";
+import { COMPANION_MEMORY_EVENT, readCompanionMemories } from "@/lib/companion/local-memory";
 import { CompanionDrawer } from "./CompanionDrawer";
 import { CompanionTrigger } from "./CompanionTrigger";
 
@@ -17,6 +18,7 @@ interface CompanionContextValue {
   messages: CompanionUiMessage[];
   isStreaming: boolean;
   pageContext: CompanionPageContext;
+  memoryCount: number;
   open: () => void;
   close: () => void;
   send: (message: string) => Promise<void>;
@@ -32,6 +34,7 @@ function contextFromPath(pathname: string): CompanionPageContext {
   if (pathname.startsWith("/schedule")) return { pageType: "schedule" };
   if (pathname.startsWith("/feed")) return { pageType: "feed" };
   if (pathname.startsWith("/tour")) return { pageType: "tour" };
+  if (pathname.startsWith("/stories")) return { pageType: "story" };
   if (pathname === "/") return { pageType: "home" };
   return { pageType: "unknown" };
 }
@@ -43,8 +46,16 @@ export function CompanionProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<CompanionUiMessage[]>([]);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [memoryCount, setMemoryCount] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const pageContext = detailContext ?? baseContext;
+
+  useEffect(() => {
+    const update = () => setMemoryCount(readCompanionMemories().length);
+    update();
+    window.addEventListener(COMPANION_MEMORY_EVENT, update);
+    return () => window.removeEventListener(COMPANION_MEMORY_EVENT, update);
+  }, []);
 
   const stop = useCallback(() => {
     abortRef.current?.abort();
@@ -81,7 +92,7 @@ export function CompanionProvider({ children }: { children: React.ReactNode }) {
 
     try {
       await streamCompanionChat(
-        { message: content, conversation: history, pageContext },
+        { message: content, conversation: history, pageContext, discoveredMemories: readCompanionMemories() },
         (event) => {
           setMessages((current) => current.map((item) => {
             if (item.id !== assistantId) return item;
@@ -112,6 +123,7 @@ export function CompanionProvider({ children }: { children: React.ReactNode }) {
     messages,
     isStreaming,
     pageContext,
+    memoryCount,
     open: () => setIsOpen(true),
     close: () => setIsOpen(false),
     send,
@@ -121,7 +133,7 @@ export function CompanionProvider({ children }: { children: React.ReactNode }) {
       setMessages([]);
     },
     setPageContext: setDetailContext,
-  }), [isOpen, messages, isStreaming, pageContext, send, stop]);
+  }), [isOpen, messages, isStreaming, pageContext, memoryCount, send, stop]);
 
   return (
     <CompanionContext.Provider value={value}>
@@ -137,4 +149,3 @@ export function useCompanion() {
   if (!value) throw new Error("useCompanion must be used inside CompanionProvider");
   return value;
 }
-

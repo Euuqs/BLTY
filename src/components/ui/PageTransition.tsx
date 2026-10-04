@@ -1,11 +1,12 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion, useReducedMotion, useScroll, useSpring } from "motion/react";
 import { usePathname } from "next/navigation";
 import { type ReactNode } from "react";
 
 export function PageTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const reduceMotion = useReducedMotion();
   const keepsCriticalContentVisible = pathname === "/tour";
   const { scrollYProgress } = useScroll();
   const navProgress = useSpring(scrollYProgress, {
@@ -18,7 +19,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
     <>
       <motion.div
         key={`page-bar-${pathname}`}
-        initial={{ scaleX: 0, opacity: 0.8 }}
+        initial={reduceMotion ? false : { scaleX: 0, opacity: 0.8 }}
         animate={{ scaleX: 1, opacity: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
         style={{
@@ -29,7 +30,7 @@ export function PageTransition({ children }: { children: ReactNode }) {
       />
       <motion.div
         key={pathname}
-        initial={{ opacity: keepsCriticalContentVisible ? 1 : 0, y: 14, scale: 0.985 }}
+        initial={reduceMotion ? false : { opacity: keepsCriticalContentVisible ? 1 : 0, y: 14, scale: 0.985 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: -8, scale: 0.995 }}
         transition={{

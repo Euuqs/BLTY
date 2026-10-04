@@ -27,6 +27,7 @@ export async function* generateCompanionEvents(
       pageContext: request.pageContext,
       intent,
       storyMatches,
+      discoveredMemories: request.discoveredMemories ?? [],
     },
     { signal },
   )) {
@@ -41,4 +42,3 @@ export async function* generateCompanionEvents(
 
   yield { type: "done", requestId };
 }
-

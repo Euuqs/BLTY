@@ -18,7 +18,7 @@ const pageLabels = {
 } as const;
 
 export function CompanionDrawer() {
-  const { isOpen, close, messages, isStreaming, send, stop, clear, pageContext } = useCompanion();
+  const { isOpen, close, messages, isStreaming, send, stop, clear, pageContext, memoryCount } = useCompanion();
   const [draft, setDraft] = useState("");
   const dialogRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -87,7 +87,7 @@ export function CompanionDrawer() {
               <div className="min-w-0 flex-1">
                 <h2 id="companion-title" className="font-serif text-base font-semibold text-foreground">故事陪伴者</h2>
                 <p className="truncate text-[11px] text-muted">
-                  独立陪伴角色 · 当前：{pageContext.title ?? pageLabels[pageContext.pageType]}
+                  独立陪伴角色 · 当前：{pageContext.title ?? pageLabels[pageContext.pageType]}{memoryCount > 0 ? ` · 记得 ${memoryCount} 张纸条` : ""}
                 </p>
               </div>
               {messages.length > 0 && (

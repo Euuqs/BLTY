@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "motion/react";
+import { motion, useReducedMotion, type Variants } from "motion/react";
 import type { ReactNode } from "react";
 
 interface RevealProps {
@@ -22,6 +22,7 @@ export function Reveal({
   blur = false,
   once = true,
 }: RevealProps) {
+  const reduceMotion = useReducedMotion();
   const offset = direction === "up" ? 26 : direction === "down" ? -26 : direction === "left" ? 26 : direction === "right" ? -26 : 0;
   const scale = direction === "scale" ? 0.92 : 1;
 
@@ -57,7 +58,7 @@ export function Reveal({
     return (
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={reduceMotion ? false : "hidden"}
         whileInView="show"
         viewport={{ once, margin: "-60px" }}
         className={className}
@@ -71,7 +72,7 @@ export function Reveal({
 
   return (
     <motion.div
-      initial={{
+      initial={reduceMotion ? false : {
         opacity: 0,
         y: direction !== "left" && direction !== "right" ? offset : 0,
         x: direction === "left" || direction === "right" ? offset : 0,

@@ -6,7 +6,7 @@ import { motion } from "motion/react";
 import { SearchPalette } from "@/components/ui/SearchPalette";
 
 const navItems = [
-  { href: "/", label: "首页" }, { href: "/same-styles", label: "同款" },
+  { href: "/", label: "首页" }, { href: "/stories", label: "故事" }, { href: "/same-styles", label: "同款" },
   { href: "/schedule", label: "行程" }, { href: "/feed", label: "动态" },
   { href: "/tour", label: "巡演" },
 ];

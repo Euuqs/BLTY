@@ -3,6 +3,7 @@ import {
   publishedFeeds as feeds,
   publishedSameStyles as sameStyles,
   publishedSchedules as schedules,
+  publishedStories as stories,
 } from "@/lib/velite";
 
 const BASE_URL = "https://bailitiaoyi.app";
@@ -26,12 +27,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/same-styles", priority: 0.9, changeFrequency: "weekly" as const },
     { path: "/schedule", priority: 0.8, changeFrequency: "weekly" as const },
     { path: "/feed", priority: 0.8, changeFrequency: "daily" as const },
+    { path: "/stories", priority: 0.9, changeFrequency: "weekly" as const },
+    { path: "/start", priority: 0.85, changeFrequency: "monthly" as const },
+    { path: "/highlights", priority: 0.85, changeFrequency: "monthly" as const },
   ];
 
-  return routes.map((r) => ({
+  return [
+    ...routes.map((r) => ({
     url: `${BASE_URL}${r.path}`,
     lastModified,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
-  }));
+    })),
+    ...stories.map((story) => ({
+      url: `${BASE_URL}/stories/${story.slug}`,
+      lastModified: story.updatedAt ? new Date(story.updatedAt) : new Date(story.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  ];
 }

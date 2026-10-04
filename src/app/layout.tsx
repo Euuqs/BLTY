@@ -77,7 +77,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN" className="h-full" suppressHydrationWarning>
+    <html lang="zh-CN" className="h-full" data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         <Script id="theme-init" strategy="beforeInteractive">
           {`try{var t=localStorage.getItem("cp-theme")||"light";document.documentElement.classList.toggle("light-theme",t==="light");var m=document.querySelector('meta[name="theme-color"]');if(m)m.content=t==="light"?"#f7f9fd":"#120d20"}catch(e){}`}

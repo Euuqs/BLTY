@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { BentoTile } from "@/components/bento/BentoTile";
-import { DogMascot, PigMascot } from "@/components/mascot/Mascots";
 import { TypeIcon } from "@/components/ui/TypeIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useFeedback } from "@/components/ui/FeedbackProvider";
@@ -49,22 +48,20 @@ function FilterButton({
 
   const activeStyles = {
     default: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]",
-    bai: "bg-bai text-background border-bai shadow-[0_0_0_1px_oklch(0.92_0.01_260/0.25)]",
+    bai: "bg-surface text-bai-ink border-bai-ink",
     zhu: "bg-zhu text-background border-zhu shadow-[0_0_0_1px_oklch(0.55_0.20_250/0.25)]",
     cp: "bg-cp text-background border-cp shadow-[0_0_0_1px_oklch(0.65_0.22_295/0.25)]",
   };
 
   return (
-    <motion.button
+    <button
       type="button"
-      whileHover={{ scale: 1.05, y: -1 }}
-      whileTap={{ scale: 0.95 }}
       onClick={(e) => {
         createRipple(e);
         onClick();
       }}
       className={
-        "relative overflow-hidden shrink-0 px-3 sm:px-3.5 py-2 sm:py-1.5 rounded-full text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container " +
+        "same-styles-filter relative overflow-hidden shrink-0 px-3 sm:px-3.5 py-2 sm:py-1.5 text-xs font-mono tracking-wide border transition-all duration-200 btn-press ripple-container " +
         (active
           ? activeStyles[variant]
           : "bg-surface/50 text-muted border-border hover:border-cp/50 hover:text-foreground")
@@ -72,11 +69,17 @@ function FilterButton({
       aria-pressed={active}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }
 
 export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
+  const heroRef = useRef<HTMLElement>(null);
+  const reduceMotion = useReducedMotion() === true;
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroImageScale = useTransform(scrollYProgress, [0, 1], reduceMotion ? [1, 1] : [1.01, 1.065]);
+  const heroImageY = useTransform(scrollYProgress, [0, 1], reduceMotion ? [0, 0] : [0, 12]);
+  const heroCopyOpacity = useTransform(scrollYProgress, [0, 0.7, 1], reduceMotion ? [1, 1, 1] : [1, 0.78, 0.42]);
   const [activeCat, setActiveCat] = useState<Category>("全部");
   const [activeMember, setActiveMember] = useState<Member>("全部");
   const [sort, setSort] = useState<SortMode>("new");
@@ -100,6 +103,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
     () => sorted.filter((s) => s.cover),
     [sorted]
   );
+  const heroCovers = useMemo(() => items.filter((item) => item.cover).slice(0, 3), [items]);
 
   const getMemberVariant = (m: Member): "bai" | "zhu" | "cp" | "default" => {
     if (m === "柏欣妤") return "bai";
@@ -109,29 +113,38 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
   };
 
   return (
-    <div className="gallery-page flex flex-col gap-6 sm:gap-8">
-      <header className="flex flex-col gap-4">
-        <div className="flex items-center gap-3">
-          <span className="font-mono text-[10px] tracking-[0.35em] text-cp uppercase">
-            {"\u00A7"} 01 {"\u00B7"} Same Style
-          </span>
-          <span className="h-px flex-1 bg-gradient-to-r from-cp/30 to-transparent" />
-          <motion.div whileHover={{ scale: 1.1, rotate: -10 }} className="cursor-pointer">
-            <DogMascot className="w-5 h-5 opacity-70" />
-          </motion.div>
-          <motion.div whileHover={{ scale: 1.1, rotate: 10 }} className="cursor-pointer">
-            <PigMascot className="w-5 h-5 opacity-70" />
-          </motion.div>
+    <div className="gallery-page same-styles-page flex flex-col gap-6 sm:gap-8">
+      <header ref={heroRef} className="same-styles-hero">
+        <motion.div className="same-styles-hero-copy" style={{ opacity: heroCopyOpacity }}>
+          <motion.p initial={reduceMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            § 02 · SAME STYLE ARCHIVE
+          </motion.p>
+          <motion.h1 initial={reduceMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}>
+            同款<span>衣橱</span>
+          </motion.h1>
+          <p>从一件衣服、一只包，到被她们分享过的日常小物。这里保存的不只是商品，也是公开生活留下的细节。</p>
+          <div><strong>{items.length}</strong><span>件公开收录</span></div>
+        </motion.div>
+
+        <div className="same-styles-hero-photos" aria-label="同款精选照片">
+          {heroCovers.map((item, index) => (
+            <motion.figure
+              key={item.slug}
+              initial={reduceMotion ? false : { clipPath: "inset(100% 0 0 0)" }}
+              animate={{ clipPath: "inset(0% 0 0 0)" }}
+              transition={{ duration: 1.05, delay: 0.12 + index * 0.1, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <motion.div style={{ scale: heroImageScale, y: heroImageY }}>
+                <Image src={item.cover!} alt="" fill priority={index === 0} sizes="(max-width: 680px) 33vw, 16vw" className="object-cover" />
+              </motion.div>
+              <figcaption>{String(index + 1).padStart(2, "0")} · {item.category}</figcaption>
+            </motion.figure>
+          ))}
         </div>
-        <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight">
-          <em className="text-gradient-cp not-italic">同款</em>衣橱
-        </h1>
-        <p className="text-muted text-sm max-w-xl">
-          柏欣妤 {"&"} 朱怡欣 的衣品、配饰、零食与生活同款，持续更新。
-        </p>
       </header>
 
-      <div className="flex flex-col gap-3">
+      <section className="same-styles-controls flex flex-col gap-3" aria-label="筛选同款">
+        <div className="same-styles-controls-heading"><span>FILTER THE ARCHIVE</span><strong>{sorted.length} 件</strong></div>
         <div role="group" aria-label="按品类与排序筛选" className="flex flex-nowrap sm:flex-wrap items-center gap-1.5 overflow-x-auto sm:overflow-visible scrollbar-hide pb-1 sm:pb-0">
           {categories.map((cat) => (
             <FilterButton
@@ -172,7 +185,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
             );
           })}
         </div>
-      </div>
+      </section>
 
       <motion.div
         layout
@@ -186,10 +199,10 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
                 key={item.slug}
                 id={item.slug}
                 layout
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                initial={reduceMotion ? false : { opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+                transition={{ duration: reduceMotion ? 0.15 : 0.32, ease: [0.22, 1, 0.36, 1] }}
               >
                 <BentoTile
                   interactive
@@ -215,7 +228,7 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
                           fill
                           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                           loading={index === 0 ? "eager" : "lazy"}
-                          className="object-cover transition-transform duration-700 group-hover:scale-110"
+                          className="object-cover transition-transform duration-700 group-hover:scale-[1.035]"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent z-[1]" />
                       </>
@@ -227,13 +240,10 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
                         />
                       </div>
                     )}
-                    <motion.div
-                      whileHover={{ scale: 1.1 }}
-                      className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-background/70 backdrop-blur-sm"
-                    >
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-2.5 py-1 bg-background/80">
                       <span className={"w-1.5 h-1.5 rounded-full " + getDot(item.member)} />
                       <span className="text-[10px] font-mono font-medium">{getLabel(item.member)}</span>
-                    </motion.div>
+                    </div>
                   </div>
                   <div className="p-4 flex flex-col gap-2 flex-1">
                     <div className="flex items-center gap-2">
@@ -245,27 +255,21 @@ export function SameStylesClient({ items }: { items: SameStyleItem[] }) {
                       {item.title}
                     </h3>
                     {item.brand && (
-                      <motion.p
-                        whileHover={{ x: 2 }}
-                        className="text-xs text-muted font-mono"
-                      >
+                      <p className="text-xs text-muted font-mono">
                         {item.brand}
-                      </motion.p>
+                      </p>
                     )}
                     <div className="mt-auto flex items-center justify-between pt-1">
                       {item.price ? (
-                        <motion.p
-                          whileHover={{ scale: 1.05 }}
-                          className="text-xs text-cp font-mono font-medium"
-                        >
+                        <p className="text-xs text-cp font-mono font-medium">
                           {"\u00A5"}{item.price}
-                        </motion.p>
+                        </p>
                       ) : (
                         <span />
                       )}
-                      <motion.div whileHover={{ rotate: 15, scale: 1.2 }}>
+                      <div>
                         <TypeIcon name={item.category} className="w-4 h-4 text-muted/30" />
-                      </motion.div>
+                      </div>
                     </div>
                   </div>
                 </BentoTile>

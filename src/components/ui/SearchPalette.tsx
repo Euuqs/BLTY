@@ -9,7 +9,7 @@ import { ArrowUpRight } from "@/components/mascot/Mascots";
 import { MetaIcon } from "./MetaIcon";
 
 type SearchResult = {
-  type: "same-style" | "schedule" | "feed";
+  type: "story" | "same-style" | "schedule" | "feed";
   title: string;
   subtitle?: string;
   href: string;
@@ -94,13 +94,15 @@ export function SearchPalette() {
   }, [activeIndex, open]);
 
   const typeLabels: Record<string, string> = {
+    story: "故事",
     "same-style": "同款",
     schedule: "行程",
     feed: "动态",
   };
 
   const typeColors: Record<string, string> = {
-    "same-style": "text-bai",
+    story: "text-cp",
+    "same-style": "text-bai-ink",
     schedule: "text-zhu",
     feed: "text-cp",
   };
@@ -166,7 +168,7 @@ export function SearchPalette() {
                       target?.click();
                     }
                   }}
-                  placeholder="搜索同款、行程、动态..."
+                  placeholder="搜索故事、日期、原话、舞台..."
                   className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted outline-none"
                   role="combobox"
                   aria-expanded={results.length > 0}
@@ -182,7 +184,7 @@ export function SearchPalette() {
                 {!query && (
                   <div className="py-8 text-center text-muted text-sm">
                     <p>输入关键词搜索全站内容</p>
-                    <p className="text-xs mt-1 text-muted/60">试试：Adidas、生日、广州</p>
+                    <p className="text-xs mt-1 text-muted/60">试试：2026.04.22、生日、杭州、永远做小女孩</p>
                   </div>
                 )}
                 {query && loading && (
